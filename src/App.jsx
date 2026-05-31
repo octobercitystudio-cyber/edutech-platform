@@ -18,6 +18,9 @@ import LessonViewer from './pages/LessonViewer';
 import Profile from './pages/Profile';
 import TeacherDashboard from './pages/TeacherDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminUsers from './pages/AdminUsers';
+import AdminCourses from './pages/AdminCourses';
+import AdminFinances from './pages/AdminFinances';
 import AssistantDashboard from './pages/AssistantDashboard';
 import ParentDashboard from './pages/ParentDashboard';
 import InstructorProfile from './pages/InstructorProfile';
@@ -115,6 +118,9 @@ function App() {
       
       <Route element={<StudentLayout />}>
         <Route path="/dashboard" element={<RoleDashboard />} />
+        <Route path="/users" element={<AdminUsers />} />
+        <Route path="/admin-courses" element={<AdminCourses />} />
+        <Route path="/finances" element={<AdminFinances />} />
         <Route path="/my-courses" element={<MyCourses />} />
         <Route path="/lesson/:id" element={<LessonViewer />} />
         <Route path="/exams" element={<Exams />} />

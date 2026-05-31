@@ -115,9 +115,21 @@ export default function Profile() {
         </div>
 
         {/* Action Buttons */}
-        <div style={{display: 'flex', gap: '15px', marginTop: '50px'}}>
-          <button style={{...styles.btn, backgroundColor: '#7dd3fc'}}>Save</button>
-          <button style={{...styles.btn, backgroundColor: '#fdba74'}}>Cancel</button>
+        <div style={{display: 'flex', gap: '15px', marginTop: '50px', justifyContent: 'space-between', alignItems: 'center'}}>
+          <div style={{display: 'flex', gap: '15px'}}>
+            <button style={{...styles.btn, backgroundColor: '#7dd3fc'}}>Save</button>
+            <button style={{...styles.btn, backgroundColor: '#fdba74'}}>Cancel</button>
+          </div>
+          
+          <button 
+            style={{...styles.btn, backgroundColor: '#0f4c81', fontSize: '0.8rem'}}
+            onClick={() => {
+              localStorage.setItem('userRole', 'admin');
+              window.location.href = '/dashboard';
+            }}
+          >
+            تفعيل وضع الإدارة (مؤقت)
+          </button>
         </div>
 
       </div>

@@ -11,7 +11,8 @@ export default function Sidebar() {
       return [
         { name: 'لوحة التحكم', path: '/dashboard', icon: <MdDashboard /> },
         { name: 'إدارة المستخدمين', path: '/users', icon: <MdMenuBook /> },
-        { name: 'التقارير المالية', path: '/reports', icon: <MdPayment /> },
+        { name: 'إدارة الكورسات', path: '/admin-courses', icon: <MdOndemandVideo /> },
+        { name: 'التقارير المالية', path: '/finances', icon: <MdPayment /> },
         { name: 'الإعدادات', path: '/settings', icon: <MdEventNote /> },
       ];
     } else if (role === 'teacher') {
