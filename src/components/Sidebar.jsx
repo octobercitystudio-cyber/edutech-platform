@@ -98,9 +98,11 @@ const styles = {
     justifyContent: 'center',
   },
   logoText: {
-    color: 'var(--primary-color)',
+    color: '#ffffff',
     margin: 0,
     fontSize: '1.8rem',
+    fontWeight: 'bold',
+    letterSpacing: '1px'
   },
   nav: {
     padding: 'var(--space-4) 0',

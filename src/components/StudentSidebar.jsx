@@ -17,6 +17,9 @@ export default function StudentSidebar() {
 
   return (
     <aside style={styles.sidebar}>
+      <div style={styles.logoContainer}>
+        <h2 style={styles.logoText}>علمني</h2>
+      </div>
       <div style={styles.profileSection}>
         <h3 style={styles.profileTitle}>الصفحة الشخصية</h3>
         <div style={styles.avatarWrapper}>
@@ -57,6 +60,20 @@ const styles = {
     position: 'sticky',
     top: 0,
     boxShadow: '-2px 0 10px rgba(0,0,0,0.02)'
+  },
+  logoContainer: {
+    padding: 'var(--space-6)',
+    borderBottom: '1px solid var(--border-color)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoText: {
+    color: '#ffffff',
+    margin: 0,
+    fontSize: '1.8rem',
+    fontWeight: 'bold',
+    letterSpacing: '1px'
   },
   profileSection: {
     padding: '30px 20px',
