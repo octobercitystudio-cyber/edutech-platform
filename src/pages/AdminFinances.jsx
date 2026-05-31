@@ -82,11 +82,13 @@ export default function AdminFinances() {
           
         if (error) throw error;
         
-        if (data && data.length > 0) {
-          setStudentWallets(studentWallets.map(s => 
-            s.student_id === student.student_id ? { ...s, balance: newBalance, wallet_id: data[0].id } : s
-          ));
-        }
+        // Update the UI regardless of whether Supabase returned the row
+        // (RLS policies often block select for anon users even if insert succeeds)
+        setStudentWallets(studentWallets.map(s => 
+          s.student_id === student.student_id 
+            ? { ...s, balance: newBalance, wallet_id: data?.[0]?.id || 'temp-id' } 
+            : s
+        ));
       }
       
       setSelectedStudentId(null);
