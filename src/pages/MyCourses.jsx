@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { MdClass, MdCastForEducation, MdMenuBook, MdPlayCircleFilled, MdAssignment, MdPlayArrow, MdClose, MdCheck, MdTrendingUp, MdCheckCircle, MdCancel } from 'react-icons/md';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { MdClass, MdCastForEducation, MdMenuBook, MdPlayCircleFilled, MdAssignment, MdPlayArrow, MdClose, MdCheck, MdTrendingUp, MdCheckCircle } from 'react-icons/md';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { supabase } from '../supabaseClient';
 
 export default function MyCourses() {
@@ -64,52 +64,43 @@ export default function MyCourses() {
     { name: 'day 7', value: 2.8 },
   ];
 
-  const pieData = [
-    { name: 'webinar', value: 0, color: 'var(--primary-color)' },
-    { name: 'test', value: 0, color: 'var(--secondary-color)' },
-    { name: 'document', value: 0, color: '#fca5a5' },
-    { name: 'video', value: 400, color: 'var(--cyan-accent)' },
-    { name: 'webcontent', value: 100, color: '#c4b5fd' },
-    { name: 'assignment', value: 0, color: '#86efac' },
-  ];
-
   const renderTabContent = () => {
     switch(activeTab) {
       case 'webinars':
         return (
           <div className="fade-in" style={{marginTop: '30px'}}>
             <div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: '20px'}}>
-              <h3 className="neon-text-primary">الندوات المباشرة (Webinars)</h3>
+              <h3 className="text-primary">الندوات المباشرة (Webinars)</h3>
             </div>
             
             <div style={{display: 'flex', gap: '20px', flexWrap: 'wrap'}}>
-              <div className="glass-card" style={styles.statCard}>
+              <div className="branded-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>لم تبدأ</div>
                   <div style={styles.statValue}>0</div>
                 </div>
-                <div style={styles.darkIcon}><MdPlayArrow /></div>
+                <div style={styles.lightIcon}><MdPlayArrow /></div>
               </div>
-              <div className="glass-card" style={styles.statCard}>
+              <div className="branded-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>غياب</div>
                   <div style={styles.statValue}>0</div>
                 </div>
-                <div style={styles.darkIcon}><MdClose /></div>
+                <div style={styles.lightIcon}><MdClose /></div>
               </div>
-              <div className="glass-card" style={styles.statCard}>
+              <div className="branded-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>حضور</div>
                   <div style={styles.statValue}>0</div>
                 </div>
-                <div style={styles.darkIcon}><MdCheck /></div>
+                <div style={styles.lightIcon}><MdCheck /></div>
               </div>
-              <div className="glass-card" style={styles.statCard}>
+              <div className="branded-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>تم التسجيل</div>
                   <div style={styles.statValue}>0</div>
                 </div>
-                <div style={styles.darkIcon}><MdAssignment /></div>
+                <div style={styles.lightIcon}><MdAssignment /></div>
               </div>
             </div>
           </div>
@@ -119,37 +110,37 @@ export default function MyCourses() {
         return (
           <div className="fade-in" style={{marginTop: '30px'}}>
             <div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: '20px'}}>
-              <h3 className="neon-text-primary">الامتحانات</h3>
+              <h3 className="text-primary">الامتحانات</h3>
             </div>
             
             <div style={{display: 'flex', gap: '20px', flexWrap: 'wrap'}}>
-              <div className="glass-card" style={styles.statCard}>
+              <div className="branded-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>لم يبدأ</div>
                   <div style={styles.statValue}>0</div>
                 </div>
-                <div style={styles.darkIcon}><MdPlayArrow /></div>
+                <div style={styles.lightIcon}><MdPlayArrow /></div>
               </div>
-              <div className="glass-card" style={styles.statCard}>
+              <div className="branded-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>فشل الاختبار</div>
                   <div style={styles.statValue}>0</div>
                 </div>
-                <div style={styles.darkIcon}><MdClose /></div>
+                <div style={styles.lightIcon}><MdClose /></div>
               </div>
-              <div className="glass-card" style={styles.statCard}>
+              <div className="branded-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>تم الاجتياز</div>
                   <div style={styles.statValue}>0</div>
                 </div>
-                <div style={styles.darkIcon}><MdCheck /></div>
+                <div style={styles.lightIcon}><MdCheck /></div>
               </div>
-              <div className="glass-card" style={styles.statCard}>
+              <div className="branded-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>متوسط درجة</div>
                   <div style={styles.statValue}>0.0%</div>
                 </div>
-                <div style={styles.darkIcon}><MdTrendingUp /></div>
+                <div style={styles.lightIcon}><MdTrendingUp /></div>
               </div>
             </div>
 
@@ -170,30 +161,30 @@ export default function MyCourses() {
         return (
           <div className="fade-in" style={{marginTop: '30px'}}>
             <div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: '20px'}}>
-              <h3 className="neon-text-primary">الحضور والغياب</h3>
+              <h3 className="text-primary">الحضور والغياب</h3>
             </div>
             
             <div style={{display: 'flex', gap: '20px', flexWrap: 'wrap'}}>
-              <div className="glass-card" style={{...styles.statCard, flex: '1.5'}}>
+              <div className="branded-card" style={{...styles.statCard, flex: '1.5'}}>
                 <div>
                   <div style={styles.statLabel}>وقت التعلم</div>
                   <div style={styles.statValue}>0 دقيقة</div>
                 </div>
-                <div style={styles.darkIcon}><MdCheckCircle /></div>
+                <div style={styles.lightIcon}><MdCheckCircle /></div>
               </div>
-              <div className="glass-card" style={styles.statCard}>
+              <div className="branded-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>مكتمل</div>
                   <div style={styles.statValue}>0</div>
                 </div>
-                <div style={styles.darkIcon}><MdCheck /></div>
+                <div style={styles.lightIcon}><MdCheck /></div>
               </div>
-              <div className="glass-card" style={styles.statCard}>
+              <div className="branded-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>غياب</div>
                   <div style={styles.statValue}>0</div>
                 </div>
-                <div style={styles.darkIcon}><MdClose /></div>
+                <div style={styles.lightIcon}><MdClose /></div>
               </div>
             </div>
 
@@ -210,26 +201,26 @@ export default function MyCourses() {
             <div style={{flex: '2 1 500px', display: 'flex', flexDirection: 'column', gap: '20px'}}>
               
               <div style={{display: 'flex', gap: '20px'}}>
-                <div className="glass-card" style={{flex: 1, padding: '20px', textAlign: 'center'}}>
-                  <h4 style={{margin: '0 0 15px 0', color: 'var(--text-main)'}}>نسبة الإنجاز (Progress)</h4>
-                  <div style={{...styles.circleProgress, borderColor: 'var(--primary-color)', color: 'var(--primary-color)', boxShadow: '0 0 15px var(--primary-glow)'}}>{selectedCourse.attendance}%</div>
+                <div className="branded-card" style={{flex: 1, padding: '20px', textAlign: 'center'}}>
+                  <h4 style={{margin: '0 0 15px 0', color: 'var(--text-muted)'}}>نسبة الإنجاز (Progress)</h4>
+                  <div style={{...styles.circleProgress, borderColor: 'var(--primary-color)', color: 'var(--primary-color)'}}>{selectedCourse.attendance}%</div>
                 </div>
-                <div className="glass-card" style={{flex: 1, padding: '20px', textAlign: 'center'}}>
-                  <h4 style={{margin: '0 0 15px 0', color: 'var(--text-main)'}}>متوسط الدرجة</h4>
-                  <div style={{...styles.circleProgress, borderColor: 'var(--secondary-color)', color: 'var(--secondary-color)', boxShadow: '0 0 15px var(--secondary-glow)'}}>{selectedCourse.avgGrade}%</div>
+                <div className="branded-card" style={{flex: 1, padding: '20px', textAlign: 'center'}}>
+                  <h4 style={{margin: '0 0 15px 0', color: 'var(--text-muted)'}}>متوسط الدرجة</h4>
+                  <div style={{...styles.circleProgress, borderColor: 'var(--secondary-color)', color: 'var(--secondary-color)'}}>{selectedCourse.avgGrade}%</div>
                 </div>
               </div>
 
-              <div className="glass-card" style={{padding: '20px'}}>
-                <h4 style={{margin: '0 0 15px 0', color: 'var(--text-main)', textAlign: 'right'}}>وحدات مكتملة</h4>
+              <div className="branded-card" style={{padding: '20px'}}>
+                <h4 style={{margin: '0 0 15px 0', color: 'var(--text-muted)', textAlign: 'right'}}>وحدات مكتملة</h4>
                 <div style={{height: '200px'}}>
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={lineData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--glass-border)" />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
                       <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: 'var(--text-muted)'}} />
                       <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: 'var(--text-muted)'}} ticks={[1, 2, 3]} />
-                      <RechartsTooltip contentStyle={{backgroundColor: 'rgba(15,23,42,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff'}} />
-                      <Area type="linear" dataKey="value" stroke="var(--cyan-accent)" fill="var(--cyan-glow)" fillOpacity={0.4} strokeWidth={3} />
+                      <RechartsTooltip contentStyle={{backgroundColor: '#fff', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)', boxShadow: '0 4px 10px rgba(0,0,0,0.05)'}} />
+                      <Area type="linear" dataKey="value" stroke="var(--primary-color)" fill="var(--primary-color)" fillOpacity={0.1} strokeWidth={3} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
@@ -239,16 +230,16 @@ export default function MyCourses() {
 
             <div style={{flex: '1 1 250px', display: 'flex', flexDirection: 'column', gap: '20px'}}>
               
-              <div className="glass-card" style={{overflow: 'hidden'}}>
-                <div style={{backgroundColor: 'rgba(255,255,255,0.05)', color: 'var(--text-main)', padding: '15px', textAlign: 'center', fontWeight: 'bold'}}>
+              <div className="branded-card" style={{overflow: 'hidden'}}>
+                <div style={{backgroundColor: '#f8fafc', color: 'var(--text-main)', padding: '15px', textAlign: 'center', fontWeight: 'bold', borderBottom: '1px solid var(--border-color)'}}>
                   {selectedCourse.type}
                 </div>
-                <div style={{padding: '20px', textAlign: 'center', backgroundColor: 'transparent'}}>
-                  <span style={{color: 'var(--secondary-color)', fontSize: '0.8rem', fontWeight: 'bold', textShadow: '0 0 8px var(--secondary-glow)'}}>مدرس المادة 📌</span>
+                <div style={{padding: '30px 20px', textAlign: 'center'}}>
+                  <span style={{color: 'var(--secondary-color)', fontSize: '0.8rem', fontWeight: 'bold'}}>مدرس المادة 📌</span>
                   <div style={{fontSize: '0.8rem', color: 'var(--text-muted)', margin: '10px 0'}}>يتم تدريسه من قبل</div>
                   <h3 style={{margin: 0, color: 'var(--text-main)'}}>{selectedCourse.instructor}</h3>
                 </div>
-                <div style={{backgroundColor: 'var(--primary-glow)', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold'}}>
+                <div style={{backgroundColor: 'var(--primary-color)', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold'}}>
                   {selectedCourse.status}
                 </div>
               </div>
@@ -265,24 +256,24 @@ export default function MyCourses() {
       {/* Main Content Area */}
       <div style={{flex: 1}}>
         <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px'}}>
-          {loading && <span className="neon-text-primary">جاري جلب بيانات الكورسات...</span>}
-          <h2 style={{margin: 0, color: 'var(--text-main)', marginLeft: 'auto'}}>فصولي الحالية</h2>
+          {loading && <span className="text-primary">جاري جلب بيانات الكورسات...</span>}
+          <h2 style={{margin: 0, color: 'var(--primary-color)', marginLeft: 'auto', fontWeight: '800'}}>فصولي الحالية</h2>
         </div>
 
         {/* Course List */}
         {!selectedCourse && (
           <div style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
             {!loading && myCourses.length === 0 ? (
-              <div className="glass-card" style={{textAlign: 'center', padding: '40px'}}>
-                <MdMenuBook size={50} color="var(--text-muted)" />
-                <h3 style={{color: 'var(--text-muted)', marginTop: '10px'}}>أنت لست مشتركاً في أي كورس حالياً.</h3>
+              <div className="branded-card" style={{textAlign: 'center', padding: '60px', backgroundColor: '#fff'}}>
+                <MdMenuBook size={60} color="#cbd5e1" />
+                <h3 style={{color: 'var(--text-muted)', marginTop: '15px', fontWeight: 'bold'}}>أنت لست مشتركاً في أي كورس حالياً.</h3>
               </div>
             ) : (
               myCourses.map(course => (
-                <div key={course.id} className="glass-card" style={styles.courseItemCard}>
+                <div key={course.id} className="branded-card" style={styles.courseItemCard}>
                   <div style={{display: 'flex', alignItems: 'center', gap: '20px', flex: 1, justifyContent: 'flex-end'}}>
                     <div style={{textAlign: 'right'}}>
-                      <h3 style={{margin: 0, fontSize: '1.1rem', color: 'var(--text-main)'}}>{course.title}</h3>
+                      <h3 style={{margin: 0, fontSize: '1.2rem', color: 'var(--primary-color)', fontWeight: 'bold'}}>{course.title}</h3>
                     </div>
                     <span style={styles.badgeBlue}>{course.status}</span>
                     <span style={{color: 'var(--text-muted)', fontSize: '0.9rem'}}>{course.type}</span>
@@ -290,7 +281,7 @@ export default function MyCourses() {
                   
                   <div style={{display: 'flex', alignItems: 'center', gap: '20px'}}>
                     <button style={styles.btnOutline} onClick={() => { setSelectedCourse(course); setActiveTab('summary'); }}>عرض المحتوى</button>
-                    <span className="neon-text-primary" style={{display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold'}}>
+                    <span className="text-secondary" style={{display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 'bold'}}>
                       دخول الفصل ⬅️
                     </span>
                   </div>
@@ -302,16 +293,16 @@ export default function MyCourses() {
 
         {/* Course Details */}
         {selectedCourse && (
-          <div className="glass-card" style={styles.card}>
+          <div className="branded-card" style={styles.card}>
             {/* Header Tabs */}
             <div style={styles.tabsContainer}>
               <span 
-                style={{color: 'var(--text-main)', fontWeight: 'bold', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px'}}
+                style={{color: 'var(--primary-color)', fontWeight: 'bold', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px'}}
                 onClick={() => setSelectedCourse(null)}
               >
                 {selectedCourse.title} ⬅️
               </span>
-              <div style={{display: 'flex', gap: '15px'}}>
+              <div style={{display: 'flex', gap: '10px'}}>
                 <span style={styles.tabItem}>الملاحظات</span>
                 <span style={styles.tabItem}>الاسئلة</span>
                 <span style={activeTab === 'webinars' ? styles.activeTabItem : styles.tabItem} onClick={() => setActiveTab('webinars')}>الندوات</span>
@@ -327,42 +318,42 @@ export default function MyCourses() {
       </div>
 
       {/* Achievements Sidebar */}
-      <div className="glass-card" style={styles.achievementsSidebar}>
-        <h3 style={{textAlign: 'center', margin: '0 0 30px 0', color: 'var(--text-main)', fontSize: '1.1rem'}}>انجازاتي</h3>
+      <div className="branded-card" style={styles.achievementsSidebar}>
+        <h3 style={{textAlign: 'center', margin: '0 0 30px 0', color: 'var(--primary-color)', fontSize: '1.2rem', fontWeight: 'bold'}}>انجازاتي</h3>
         
         <div style={styles.achievementItem}>
-          <div style={{...styles.iconWrapper, backgroundColor: 'rgba(255,255,255,0.05)', color: 'var(--cyan-accent)', boxShadow: '0 0 15px var(--cyan-glow)'}}>
+          <div style={{...styles.iconWrapper, backgroundColor: 'rgba(15, 76, 129, 0.1)', color: 'var(--primary-color)'}}>
             <MdClass size={30} />
           </div>
-          <div style={{...styles.achieveValue, color: 'var(--cyan-accent)'}}>{myCourses.length}</div>
+          <div style={{...styles.achieveValue, color: 'var(--primary-color)'}}>{myCourses.length}</div>
           <div style={styles.achieveLabel}>كورس مشترك</div>
         </div>
 
         <div style={styles.achievementItem}>
-          <div style={{...styles.iconWrapper, backgroundColor: 'rgba(255,255,255,0.05)', color: 'var(--cyan-accent)', boxShadow: '0 0 15px var(--cyan-glow)'}}>
+          <div style={{...styles.iconWrapper, backgroundColor: 'rgba(15, 76, 129, 0.1)', color: 'var(--primary-color)'}}>
             <MdCastForEducation size={30} />
           </div>
-          <div style={{...styles.achieveValue, color: 'var(--cyan-accent)'}}>
+          <div style={{...styles.achieveValue, color: 'var(--primary-color)'}}>
             {selectedCourse ? selectedCourse.completedLessons : 0}
           </div>
           <div style={styles.achieveLabel}>حصص مكتملة</div>
         </div>
 
         {/* Small bottom icons */}
-        <div style={{display: 'flex', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '30px', borderTop: '1px solid var(--glass-border)'}}>
+        <div style={{display: 'flex', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '30px', borderTop: '1px solid var(--border-color)'}}>
           <div style={styles.smallAchieve}>
-            <div style={{...styles.smallIcon, backgroundColor: 'rgba(255,255,255,0.05)', color: 'var(--secondary-color)'}}><MdMenuBook /></div>
-            <div style={{...styles.achieveValueSmall, color: 'var(--secondary-color)'}}>0</div>
+            <div style={{...styles.smallIcon, backgroundColor: 'rgba(255, 183, 3, 0.15)', color: 'var(--secondary-hover)'}}><MdMenuBook /></div>
+            <div style={{...styles.achieveValueSmall, color: 'var(--text-main)'}}>0</div>
             <div style={styles.achieveLabelSmall}>ملفات</div>
           </div>
           <div style={styles.smallAchieve}>
-            <div style={{...styles.smallIcon, backgroundColor: 'rgba(255,255,255,0.05)', color: 'var(--secondary-color)'}}><MdPlayCircleFilled /></div>
-            <div style={{...styles.achieveValueSmall, color: 'var(--secondary-color)'}}>0</div>
+            <div style={{...styles.smallIcon, backgroundColor: 'rgba(255, 183, 3, 0.15)', color: 'var(--secondary-hover)'}}><MdPlayCircleFilled /></div>
+            <div style={{...styles.achieveValueSmall, color: 'var(--text-main)'}}>0</div>
             <div style={styles.achieveLabelSmall}>فيديوهات</div>
           </div>
           <div style={styles.smallAchieve}>
-            <div style={{...styles.smallIcon, backgroundColor: 'rgba(255,255,255,0.05)', color: 'var(--secondary-color)'}}><MdAssignment /></div>
-            <div style={{...styles.achieveValueSmall, color: 'var(--secondary-color)'}}>0</div>
+            <div style={{...styles.smallIcon, backgroundColor: 'rgba(255, 183, 3, 0.15)', color: 'var(--secondary-hover)'}}><MdAssignment /></div>
+            <div style={{...styles.achieveValueSmall, color: 'var(--text-main)'}}>0</div>
             <div style={styles.achieveLabelSmall}>اختبارات</div>
           </div>
         </div>
@@ -376,7 +367,7 @@ export default function MyCourses() {
 const styles = {
   achievementsSidebar: {
     width: '280px',
-    padding: '25px',
+    padding: '30px 20px',
     display: 'flex',
     flexDirection: 'column',
     minHeight: '80vh'
@@ -385,7 +376,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    marginBottom: '30px'
+    marginBottom: '35px'
   },
   iconWrapper: {
     width: '70px',
@@ -400,7 +391,6 @@ const styles = {
     fontSize: '2.5rem',
     fontWeight: 'bold',
     marginBottom: '5px',
-    textShadow: '0 0 10px rgba(255,255,255,0.3)'
   },
   achieveLabel: {
     fontSize: '1rem',
@@ -433,7 +423,7 @@ const styles = {
     textAlign: 'center'
   },
   courseItemCard: {
-    padding: '20px 30px',
+    padding: '25px 30px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -441,23 +431,23 @@ const styles = {
     cursor: 'pointer'
   },
   badgeBlue: {
-    backgroundColor: 'var(--primary-glow)',
-    color: '#fff',
-    border: '1px solid var(--primary-color)',
+    backgroundColor: 'rgba(15, 76, 129, 0.1)',
+    color: 'var(--primary-color)',
+    border: '1px solid rgba(15, 76, 129, 0.2)',
     padding: '5px 15px',
     borderRadius: '8px',
-    fontSize: '0.85rem'
+    fontSize: '0.85rem',
+    fontWeight: 'bold'
   },
   btnOutline: {
-    border: '1px solid var(--cyan-accent)',
-    color: 'var(--cyan-accent)',
+    border: '1px solid var(--primary-color)',
+    color: 'var(--primary-color)',
     backgroundColor: 'transparent',
     padding: '8px 30px',
     borderRadius: '20px',
     cursor: 'pointer',
     fontWeight: 'bold',
-    textShadow: '0 0 5px var(--cyan-glow)',
-    boxShadow: 'inset 0 0 5px var(--cyan-glow)'
+    transition: 'all 0.2s'
   },
   card: {
     padding: '25px',
@@ -466,7 +456,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottom: '1px solid var(--glass-border)',
+    borderBottom: '1px solid var(--border-color)',
     paddingBottom: '15px'
   },
   tabItem: {
@@ -478,15 +468,14 @@ const styles = {
     transition: '0.2s'
   },
   activeTabItem: {
-    color: 'var(--cyan-accent)',
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    border: '1px solid var(--glass-border)',
+    color: 'var(--primary-color)',
+    backgroundColor: 'rgba(15, 76, 129, 0.05)',
+    border: '1px solid rgba(15, 76, 129, 0.1)',
     padding: '8px 15px',
     borderRadius: '20px',
     fontSize: '0.9rem',
     fontWeight: 'bold',
     cursor: 'pointer',
-    textShadow: '0 0 5px var(--cyan-glow)'
   },
   circleProgress: {
     width: '120px',
@@ -500,7 +489,6 @@ const styles = {
     fontSize: '2.5rem',
     fontWeight: 'bold',
     margin: '0 auto',
-    textShadow: '0 0 10px rgba(255,255,255,0.3)'
   },
   statCard: {
     flex: 1,
@@ -520,12 +508,12 @@ const styles = {
     fontWeight: 'bold',
     color: 'var(--text-main)'
   },
-  darkIcon: {
+  lightIcon: {
     width: '45px',
     height: '45px',
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    color: 'var(--text-main)',
-    border: '1px solid var(--glass-border)',
+    backgroundColor: '#f8fafc',
+    color: 'var(--primary-color)',
+    border: '1px solid var(--border-color)',
     borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',

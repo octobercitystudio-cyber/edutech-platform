@@ -1,122 +1,84 @@
-/* Dark Neon Glassmorphism Theme for Student Dashboard */
-.student-theme-dark {
-  /* Override core background to a deep dark blue/gray */
-  --bg-color: #0b0f19;
+/* Branded Light Theme for Student Dashboard */
+.student-theme-branded {
+  /* Core background to a soft, clean light gray/blue */
+  --bg-color: #f0f4f8;
   
-  /* Glass surfaces */
-  --surface-color: rgba(26, 32, 53, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.05);
+  /* Surfaces */
+  --surface-color: #ffffff;
   
   /* Text */
-  --text-main: #f1f5f9;
-  --text-muted: #94a3b8;
-  
-  /* Accent adjustments for glow effects */
-  --primary-glow: rgba(15, 76, 129, 0.5);
-  --secondary-glow: rgba(255, 183, 3, 0.5);
-  --cyan-accent: #06b6d4;
-  --cyan-glow: rgba(6, 182, 212, 0.5);
+  --text-main: #1e293b;
+  --text-muted: #64748b;
   
   /* Borders and UI */
-  --border-color: rgba(255, 255, 255, 0.08);
+  --border-color: #e2e8f0;
   
   background-color: var(--bg-color);
   min-height: 100vh;
   color: var(--text-main);
-  background-image: 
-    radial-gradient(circle at 15% 50%, rgba(15, 76, 129, 0.15), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(255, 183, 3, 0.08), transparent 25%);
 }
 
-/* Glassmorphism Cards */
-.student-theme-dark .glass-card {
-  background-color: var(--surface-color);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
-}
-
-.student-theme-dark .glass-card:hover {
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), 0 0 15px var(--primary-glow);
-}
-
-/* Typography Overrides */
-.student-theme-dark h1, 
-.student-theme-dark h2, 
-.student-theme-dark h3, 
-.student-theme-dark h4, 
-.student-theme-dark h5, 
-.student-theme-dark h6 {
+/* Sidebar Overrides for Branded Theme */
+.student-theme-branded aside {
+  background-color: var(--primary-color) !important; /* Deep Blue */
+  border-left: none !important;
   color: #ffffff;
 }
 
-/* Sidebar Overrides for Dark Theme */
-.student-theme-dark aside {
-  background-color: rgba(15, 23, 42, 0.8) !important;
-  backdrop-filter: blur(15px);
-  border-left: 1px solid var(--glass-border) !important;
+.student-theme-branded aside h3.profileTitle {
+  color: #ffffff !important;
 }
 
-.student-theme-dark aside ul li {
-  color: var(--text-muted) !important;
+.student-theme-branded aside ul li {
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 
-.student-theme-dark aside ul li.active {
-  background: linear-gradient(90deg, rgba(15,76,129,0.4) 0%, transparent 100%) !important;
+.student-theme-branded aside ul li.active {
+  background: rgba(255, 183, 3, 0.15) !important;
   color: var(--secondary-color) !important;
-  border-right: 3px solid var(--secondary-color) !important;
-  text-shadow: 0 0 8px var(--secondary-glow);
+  border-right: 4px solid var(--secondary-color) !important;
 }
 
-.student-theme-dark aside ul li:hover:not(.active) {
+.student-theme-branded aside ul li:hover:not(.active) {
   background-color: rgba(255, 255, 255, 0.05) !important;
   color: #ffffff !important;
 }
 
 /* Header Overrides */
-.student-theme-dark header {
-  background-color: rgba(15, 23, 42, 0.5) !important;
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--glass-border) !important;
+.student-theme-branded header {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
 }
 
-.student-theme-dark header input {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid var(--glass-border) !important;
-  color: #fff !important;
+/* Clean Branded Cards */
+.student-theme-branded .branded-card {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
 }
 
-.student-theme-dark header input::placeholder {
-  color: var(--text-muted);
+.student-theme-branded .branded-card:hover {
+  box-shadow: 0 8px 25px rgba(15, 76, 129, 0.08);
+  border-color: rgba(15, 76, 129, 0.2);
 }
 
-/* Tables in Dark Theme */
-.student-theme-dark table th {
+/* Tables in Branded Theme */
+.student-theme-branded table th {
   color: var(--text-muted) !important;
-  border-bottom: 1px solid var(--glass-border) !important;
+  border-bottom: 1px solid var(--border-color) !important;
 }
 
-.student-theme-dark table td {
-  border-bottom: 1px solid var(--glass-border) !important;
+.student-theme-branded table td {
+  border-bottom: 1px solid #f8fafc !important;
 }
 
-.student-theme-dark table tr {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
+/* Text overrides */
+.student-theme-branded .text-primary {
+  color: var(--primary-color);
 }
-
-/* Progress Circles / Neon Text */
-.student-theme-dark .neon-text-primary {
-  color: var(--cyan-accent);
-  text-shadow: 0 0 10px var(--cyan-glow);
-}
-
-.student-theme-dark .neon-text-secondary {
+.student-theme-branded .text-secondary {
   color: var(--secondary-color);
-  text-shadow: 0 0 10px var(--secondary-glow);
 }
