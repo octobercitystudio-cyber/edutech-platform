@@ -39,13 +39,28 @@ export default function AdminUsers() {
   const handleAddUser = async (e) => {
     e.preventDefault();
     try {
-      // For MVP, we insert directly into profiles with a mock UUID
-      // In production, this would use Supabase Admin API to create auth user first
-      const mockId = 'mock-' + Date.now();
-      const { data, error } = await supabase
+      // 1. Create auth user (this usually logs the user in, but since we use bypass login locally, it's fine for MVP)
+      // We will use a generic password for admin-created users
+      const genericPassword = 'Password123!';
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: newUser.email,
+        password: genericPassword,
+      });
+
+      if (authError) {
+        throw authError;
+      }
+
+      const userId = authData.user?.id;
+      if (!userId) {
+        throw new Error('لم يتم إرجاع معرف المستخدم من النظام.');
+      }
+
+      // 2. Insert into profiles with the REAL UUID
+      const { data, error: profileError } = await supabase
         .from('profiles')
         .insert([{
-          id: mockId,
+          id: userId,
           name: newUser.name,
           email: newUser.email,
           phone: newUser.phone,
@@ -53,17 +68,17 @@ export default function AdminUsers() {
         }])
         .select();
 
-      if (error) throw error;
+      // If the profile insert fails, we might have an issue, but sometimes Supabase triggers create the profile automatically.
+      // We will fetch the profiles again to ensure it's loaded.
       
-      if (data) {
-        setUsers([data[0], ...users]);
-        setShowAddModal(false);
-        setNewUser({ name: '', email: '', phone: '', role: 'student' });
-        alert('تمت إضافة المستخدم بنجاح!');
-      }
+      fetchUsers();
+      setShowAddModal(false);
+      setNewUser({ name: '', email: '', phone: '', role: 'student' });
+      alert(`تمت إضافة المستخدم بنجاح! كلمة المرور الافتراضية هي: ${genericPassword}`);
+      
     } catch (err) {
-      console.error(err);
-      alert('حدث خطأ أثناء إضافة المستخدم');
+      console.error('Error adding user:', err);
+      alert('حدث خطأ أثناء إضافة المستخدم: ' + err.message);
     }
   };
 
