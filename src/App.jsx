@@ -39,7 +39,7 @@ function RoleDashboard() {
 function StudentLayout() {
   const role = localStorage.getItem('userRole') || 'student';
   return (
-    <div className={`app-layout ${role === 'student' ? 'student-theme-lightglass' : ''}`} style={role !== 'student' ? {backgroundColor: '#f8fafc'} : {}}>
+    <div className={`app-layout ${role === 'student' ? 'student-theme-branded' : ''}`} style={role !== 'student' ? {backgroundColor: '#f8fafc'} : {}}>
       {role === 'student' ? <StudentSidebar /> : <Sidebar />}
       <div className="main-content">
         <Header />

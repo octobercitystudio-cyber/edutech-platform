@@ -1,116 +1,110 @@
-/* Light Glassmorphism Theme for Student Dashboard */
-.student-theme-lightglass {
-  /* Core background gradient - very soft, light, integrating platform colors */
-  background: linear-gradient(135deg, #f8fafc 0%, rgba(15, 76, 129, 0.08) 50%, rgba(255, 183, 3, 0.08) 100%);
+/* Clean Branded Theme for Student Dashboard */
+.student-theme-branded {
+  /* Core background to a soft, clean light gray/blue */
+  --bg-color: #f4f7f9;
+  
+  /* Surfaces */
+  --surface-color: #ffffff;
   
   /* Text */
-  --text-main: #0f172a;
+  --text-main: #1e293b;
   --text-muted: #64748b;
   
   /* Borders and UI */
-  --glass-border: rgba(255, 255, 255, 0.5);
-  --glass-bg: rgba(255, 255, 255, 0.65);
+  --border-color: #e2e8f0;
   
+  background-color: var(--bg-color);
   min-height: 100vh;
   color: var(--text-main);
-  position: relative;
 }
 
-/* Add a pseudo-element for extra subtle glowing orbs in the background to enhance glass effect */
-.student-theme-lightglass::before {
-  content: "";
-  position: absolute;
-  top: 10%;
-  left: 20%;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(15, 76, 129, 0.05) 0%, transparent 70%);
-  border-radius: 50%;
-  z-index: 0;
-  pointer-events: none;
+/* Sidebar Overrides for Clean Branded Theme */
+.student-theme-branded aside {
+  background-color: var(--primary-color) !important; /* Deep Blue */
+  border-left: none !important;
+  color: #ffffff;
 }
 
-.student-theme-lightglass::after {
-  content: "";
-  position: absolute;
-  bottom: 10%;
-  right: 15%;
-  width: 350px;
-  height: 350px;
-  background: radial-gradient(circle, rgba(255, 183, 3, 0.05) 0%, transparent 70%);
-  border-radius: 50%;
-  z-index: 0;
-  pointer-events: none;
+.student-theme-branded aside h3.profileTitle {
+  color: #ffffff !important;
 }
 
-/* Ensure main content is above the background orbs */
-.student-theme-lightglass .main-content,
-.student-theme-lightglass aside {
-  position: relative;
-  z-index: 1;
+.student-theme-branded aside ul li {
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 
-/* Sidebar Overrides for Light Glassmorphism */
-.student-theme-lightglass aside {
-  background-color: rgba(255, 255, 255, 0.4) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-left: 1px solid rgba(255, 255, 255, 0.6) !important;
-  box-shadow: -4px 0 25px rgba(15, 76, 129, 0.05);
-}
-
-.student-theme-lightglass aside h3.profileTitle {
-  color: var(--primary-color) !important;
-}
-
-.student-theme-lightglass aside ul li {
-  color: var(--text-muted) !important;
-}
-
-.student-theme-lightglass aside ul li.active {
-  background: rgba(255, 255, 255, 0.5) !important;
-  color: var(--secondary-hover) !important;
+.student-theme-branded aside ul li.active {
+  background: rgba(255, 183, 3, 0.15) !important;
+  color: var(--secondary-color) !important;
   border-right: 4px solid var(--secondary-color) !important;
-  box-shadow: 0 4px 15px rgba(255, 183, 3, 0.1);
 }
 
-.student-theme-lightglass aside ul li:hover:not(.active) {
-  background-color: rgba(255, 255, 255, 0.3) !important;
-  color: var(--primary-color) !important;
+.student-theme-branded aside ul li:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: #ffffff !important;
 }
 
 /* Header Overrides */
-.student-theme-lightglass header {
-  background-color: rgba(255, 255, 255, 0.4) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.6) !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+.student-theme-branded header {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-/* Light Glass Cards */
-.student-theme-lightglass .lightglass-card {
-  background-color: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
+/* Clean Branded Cards */
+.student-theme-branded .branded-card {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
 }
 
-.student-theme-lightglass .lightglass-card:hover {
-  box-shadow: 0 8px 32px 0 rgba(15, 76, 129, 0.15);
-  border-color: rgba(255, 255, 255, 0.8);
-  transform: translateY(-2px);
+.student-theme-branded .branded-card:hover {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+  border-color: rgba(15, 76, 129, 0.1);
 }
 
-/* Tables in Glass Theme */
-.student-theme-lightglass table th {
+/* Tables in Branded Theme */
+.student-theme-branded table th {
   color: var(--text-muted) !important;
-  border-bottom: 1px solid rgba(15, 76, 129, 0.1) !important;
+  border-bottom: 1px solid var(--border-color) !important;
 }
 
-.student-theme-lightglass table td {
-  border-bottom: 1px solid rgba(15, 76, 129, 0.05) !important;
+.student-theme-branded table td {
+  border-bottom: 1px solid #f8fafc !important;
+}
+
+/* Common UI Elements */
+.student-theme-branded .badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.student-theme-branded .badge-primary {
+  background-color: rgba(15, 76, 129, 0.1);
+  color: var(--primary-color);
+}
+
+.student-theme-branded .badge-secondary {
+  background-color: rgba(255, 183, 3, 0.15);
+  color: #b45309; /* Darker orange for text */
+}
+
+/* Progress bar container */
+.student-theme-branded .progress-container {
+  width: 100%;
+  height: 8px;
+  background-color: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.student-theme-branded .progress-bar {
+  height: 100%;
+  background-color: var(--secondary-color);
+  border-radius: 4px;
 }

@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { supabase } from '../supabaseClient';
-import { MdCalendarToday, MdStar, MdTrendingUp } from 'react-icons/md';
+import { MdPlayCircleFilled, MdCalendarToday, MdStar, MdMenuBook, MdAccessTime, MdTrendingUp, MdAssignment } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
   const [userName, setUserName] = useState(localStorage.getItem('userName') || 'طالب');
   const [walletBalance, setWalletBalance] = useState(0);
-  const [transactions, setTransactions] = useState([]);
+  const [myCourses, setMyCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Calendar logic
-  const today = new Date();
-  const currentMonth = today.toLocaleString('ar-EG', { month: 'long' });
-  const currentDay = today.getDate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchDashboardData();
@@ -22,27 +18,39 @@ export default function Dashboard() {
     try {
       setLoading(true);
       const { data: userData } = await supabase.auth.getUser();
-      if (userData?.user) {
-        // Fetch wallet
-        const { data: walletData } = await supabase
-          .from('wallet')
-          .select('*')
-          .eq('student_id', userData.user.id)
-          .single();
-        
-        if (walletData) {
-          setWalletBalance(walletData.balance);
-        }
+      if (!userData?.user) return;
 
-        // Fetch name
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('name')
-          .eq('id', userData.user.id)
-          .single();
-        
-        if (profile) setUserName(profile.name.split(' ')[0]);
+      // Fetch wallet
+      const { data: walletData } = await supabase
+        .from('wallet')
+        .select('balance')
+        .eq('student_id', userData.user.id)
+        .single();
+      if (walletData) setWalletBalance(walletData.balance);
+
+      // Fetch profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('name')
+        .eq('id', userData.user.id)
+        .single();
+      if (profile) setUserName(profile.name.split(' ')[0]);
+
+      // Fetch recent courses
+      const { data: enrollments } = await supabase
+        .from('enrollments')
+        .select(`
+          id,
+          progress,
+          courses (id, title, instructor_name, type)
+        `)
+        .eq('student_id', userData.user.id)
+        .limit(3);
+
+      if (enrollments) {
+        setMyCourses(enrollments);
       }
+
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
     } finally {
@@ -50,185 +58,250 @@ export default function Dashboard() {
     }
   };
 
-  const lineData = [
-    { name: 'السبت', value: 0 },
-    { name: 'الأحد', value: 1.2 },
-    { name: 'الاثنين', value: 0.5 },
-    { name: 'الثلاثاء', value: 2.1 },
-    { name: 'الأربعاء', value: 0 },
-    { name: 'الخميس', value: 3.4 },
-    { name: 'الجمعة', value: 2.8 },
-  ];
-
-  const pieData = [
-    { name: 'امتحانات', value: 20, color: 'var(--secondary-color)' },
-    { name: 'مستندات', value: 15, color: '#fca5a5' },
-    { name: 'فيديوهات', value: 65, color: 'var(--primary-color)' },
-  ];
+  const today = new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
-    <div className="fade-in" style={{padding: '20px 0'}}>
+    <div className="fade-in" style={{padding: '20px 0', maxWidth: '1200px', margin: '0 auto'}}>
       
-      {/* Top Row */}
-      <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '20px'}}>
-        
-        {/* Calendar Card */}
-        <div className="lightglass-card" style={{...styles.card, textAlign: 'center', position: 'relative', overflow: 'hidden'}}>
-          <div style={styles.calendarRings}>
-            {[...Array(9)].map((_, i) => <div key={i} style={styles.ring}></div>)}
-          </div>
-          <div style={{marginTop: '25px', color: 'var(--primary-color)'}}>
-            <MdCalendarToday size={40} />
-          </div>
-          <h2 style={{color: 'var(--primary-color)', fontSize: '1.2rem', marginTop: '10px'}}>{currentMonth}</h2>
-          <div style={{fontSize: '3rem', fontWeight: 'bold', color: 'var(--secondary-color)'}}>
-            {currentDay}
-          </div>
-          <p style={{color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '5px'}}>لديك مهمتان اليوم</p>
+      {/* 1. Welcome Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, var(--primary-color) 0%, #1e88e5 100%)',
+        borderRadius: 'var(--radius-lg)',
+        padding: '40px',
+        color: '#fff',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '30px',
+        boxShadow: '0 10px 25px rgba(15, 76, 129, 0.15)'
+      }}>
+        <div>
+          <h1 style={{margin: '0 0 10px 0', fontSize: '2.2rem', color: '#fff'}}>مرحباً بعودتك، {userName}! 👋</h1>
+          <p style={{margin: 0, fontSize: '1.1rem', opacity: 0.9}}>مستعد لاستكمال مسيرتك التعليمية اليوم؟ ({today})</p>
         </div>
-
-        {/* Rank Card */}
-        <div className="lightglass-card" style={{...styles.card, textAlign: 'center'}}>
-          <h2 style={{marginBottom: '15px', fontSize: '1.2rem', color: 'var(--primary-color)'}}>ترتيبك هذا الأسبوع</h2>
-          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px'}}>
-            <div style={{
-              width: '80px', height: '80px', borderRadius: '50%', 
-              backgroundColor: 'rgba(255, 183, 3, 0.1)', border: '3px solid var(--secondary-color)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 10px rgba(255, 183, 3, 0.2)'
-            }}>
-              <span style={{fontSize: '2rem', fontWeight: 'bold', color: 'var(--secondary-hover)'}}>#4</span>
-            </div>
-          </div>
-          <div style={{marginTop: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', color: '#10b981', fontWeight: 'bold'}}>
-            <MdTrendingUp />
-            <span>متقدم بـ 2 مركز عن الأسبوع الماضي!</span>
-          </div>
+        <div style={{textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.15)', padding: '15px 30px', borderRadius: 'var(--radius-md)', backdropFilter: 'blur(5px)'}}>
+          <div style={{fontSize: '0.9rem', marginBottom: '5px'}}>رصيد المحفظة</div>
+          <div style={{fontSize: '1.8rem', fontWeight: 'bold', color: 'var(--secondary-color)'}}>{walletBalance} ج.م</div>
         </div>
+      </div>
 
-        {/* Welcome Card */}
-        <div className="lightglass-card" style={{...styles.card, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '30px', backgroundColor: 'rgba(15, 76, 129, 0.85)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.3)'}}>
-          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
-            <div style={{fontSize: '2.5rem', color: 'var(--secondary-color)'}}>🎓</div>
-            <h2 style={{margin: 0, fontSize: '2rem', direction: 'ltr', color: '#fff'}}>{userName} ,مرحباً</h2>
+      {/* 2. Quick Stats */}
+      <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '30px'}}>
+        <div className="branded-card" style={styles.statCard}>
+          <div style={{...styles.iconBox, backgroundColor: 'rgba(15, 76, 129, 0.1)', color: 'var(--primary-color)'}}>
+            <MdMenuBook size={24} />
           </div>
           <div>
-            <h3 style={{margin: '0 0 10px 0', fontSize: '1.2rem', fontWeight: 'normal', opacity: 0.9, color: '#fff'}}>جاهز لرحلة تفوق جديدة اليوم؟</h3>
-            <div style={{display: 'inline-block', backgroundColor: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)', padding: '5px 15px', borderRadius: '20px', fontSize: '0.9rem', color: '#fff'}}>
-              الرصيد: {walletBalance} ج.م
-            </div>
+            <div style={styles.statLabel}>الكورسات المشترك بها</div>
+            <div style={styles.statValue}>{myCourses.length}</div>
           </div>
         </div>
-
-      </div>
-
-      {/* Middle Row (Charts) */}
-      <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px', marginBottom: '20px'}}>
         
-        {/* Line Chart */}
-        <div className="lightglass-card" style={styles.card}>
-          <h3 style={{textAlign: 'center', marginBottom: '20px', color: 'var(--primary-color)'}}>معدل التعلم (الساعات)</h3>
-          <div style={{height: '250px'}}>
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={lineData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(15, 76, 129, 0.1)" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: 'var(--text-muted)'}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: 'var(--text-muted)'}} />
-                <RechartsTooltip contentStyle={{backgroundColor: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.5)', borderRadius: '8px', color: 'var(--text-main)', boxShadow: '0 4px 10px rgba(0,0,0,0.05)'}} />
-                <Area type="monotone" dataKey="value" stroke="var(--primary-color)" fill="var(--primary-color)" fillOpacity={0.1} strokeWidth={3} />
-              </AreaChart>
-            </ResponsiveContainer>
+        <div className="branded-card" style={styles.statCard}>
+          <div style={{...styles.iconBox, backgroundColor: 'rgba(255, 183, 3, 0.15)', color: '#b45309'}}>
+            <MdTrendingUp size={24} />
+          </div>
+          <div>
+            <div style={styles.statLabel}>الترتيب (Rank)</div>
+            <div style={styles.statValue}>#4</div>
           </div>
         </div>
 
-        {/* Donut Chart */}
-        <div className="lightglass-card" style={styles.card}>
-          <h3 style={{textAlign: 'center', marginBottom: '20px', color: 'var(--primary-color)'}}>توزيع الأنشطة</h3>
-          <div style={{display: 'flex', alignItems: 'center', height: '250px'}}>
+        <div className="branded-card" style={styles.statCard}>
+          <div style={{...styles.iconBox, backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981'}}>
+            <MdAccessTime size={24} />
+          </div>
+          <div>
+            <div style={styles.statLabel}>ساعات التعلم</div>
+            <div style={styles.statValue}>12.5</div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '30px'}}>
+        
+        {/* Main Column */}
+        <div style={{display: 'flex', flexDirection: 'column', gap: '30px'}}>
+          
+          {/* 3. Continue Learning */}
+          <div className="branded-card" style={{padding: '25px'}}>
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px'}}>
+              <h2 style={{margin: 0, fontSize: '1.4rem', color: 'var(--primary-color)'}}>متابعة التعلم</h2>
+              <button style={{background: 'none', border: 'none', color: 'var(--secondary-color)', fontWeight: 'bold', cursor: 'pointer'}} onClick={() => navigate('/my-courses')}>
+                عرض الكل
+              </button>
+            </div>
             
-            <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '1rem', color: 'var(--text-muted)', textAlign: 'right', alignItems: 'flex-end'}}>
-              {pieData.map((entry, idx) => (
-                <div key={idx} style={{display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600'}}>
-                  {entry.name} <span style={{width: '12px', height: '12px', borderRadius: '50%', backgroundColor: entry.color}}></span>
-                </div>
-              ))}
-            </div>
+            {loading ? (
+              <div style={{textAlign: 'center', padding: '20px', color: 'var(--text-muted)'}}>جاري التحميل...</div>
+            ) : myCourses.length === 0 ? (
+              <div style={{textAlign: 'center', padding: '40px', color: 'var(--text-muted)', backgroundColor: '#f8fafc', borderRadius: 'var(--radius-md)'}}>
+                <MdMenuBook size={40} style={{marginBottom: '10px', color: '#cbd5e1'}} />
+                <div>أنت لست مشتركاً في أي كورس حالياً.</div>
+              </div>
+            ) : (
+              <div style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
+                {myCourses.map((enrollment) => (
+                  <div key={enrollment.id} style={styles.courseRow}>
+                    <div style={{flex: 1}}>
+                      <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px'}}>
+                        <span className="badge badge-primary">{enrollment.courses.type || 'اونلاين'}</span>
+                        <h3 style={{margin: 0, fontSize: '1.1rem'}}>{enrollment.courses.title}</h3>
+                      </div>
+                      <div style={{fontSize: '0.85rem', color: 'var(--text-muted)'}}>المعلم: {enrollment.courses.instructor_name || 'غير محدد'}</div>
+                      <div className="progress-container">
+                        <div className="progress-bar" style={{width: `${enrollment.progress || 0}%`}}></div>
+                      </div>
+                      <div style={{fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '5px', textAlign: 'left'}}>{enrollment.progress || 0}% مكتمل</div>
+                    </div>
+                    <button 
+                      style={styles.playBtn}
+                      onClick={() => navigate('/my-courses')}
+                    >
+                      <MdPlayCircleFilled size={20} /> استئناف
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-            <div style={{flex: 1, height: '100%'}}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={pieData} innerRadius={70} outerRadius={90} paddingAngle={2} dataKey="value" stroke="none">
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
+          {/* 5. Recent Transactions */}
+          <div className="branded-card" style={{padding: '25px'}}>
+            <h2 style={{margin: '0 0 20px 0', fontSize: '1.4rem', color: 'var(--primary-color)'}}>أحدث المعاملات</h2>
+            <div style={{overflowX: 'auto'}}>
+              <table style={{width: '100%', borderCollapse: 'collapse', textAlign: 'right'}}>
+                <thead>
+                  <tr>
+                    <th style={{padding: '12px'}}>التاريخ</th>
+                    <th style={{padding: '12px'}}>الوصف</th>
+                    <th style={{padding: '12px'}}>القيمة</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colSpan="3" style={{textAlign: 'center', padding: '30px', color: 'var(--text-muted)'}}>
+                      لا توجد معاملات مالية سابقة
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
+
+        </div>
+
+        {/* Sidebar Column */}
+        <div style={{display: 'flex', flexDirection: 'column', gap: '30px'}}>
+          
+          {/* 4. Upcoming Tasks */}
+          <div className="branded-card" style={{padding: '25px'}}>
+            <h2 style={{margin: '0 0 20px 0', fontSize: '1.4rem', color: 'var(--primary-color)', display: 'flex', alignItems: 'center', gap: '8px'}}>
+              <MdAssignment /> المهام القادمة
+            </h2>
+            
+            <div style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
+              <div style={styles.taskItem}>
+                <div style={styles.taskDate}>
+                  <span style={{fontSize: '1.2rem', fontWeight: 'bold'}}>15</span>
+                  <span style={{fontSize: '0.8rem'}}>أغسطس</span>
+                </div>
+                <div>
+                  <h4 style={{margin: '0 0 5px 0', color: 'var(--text-main)'}}>امتحان الفيزياء - الباب الأول</h4>
+                  <div style={{fontSize: '0.85rem', color: 'var(--text-muted)'}}>الساعة 8:00 مساءً</div>
+                </div>
+              </div>
+
+              <div style={{...styles.taskItem, borderLeftColor: 'var(--primary-color)'}}>
+                <div style={styles.taskDate}>
+                  <span style={{fontSize: '1.2rem', fontWeight: 'bold'}}>18</span>
+                  <span style={{fontSize: '0.8rem'}}>أغسطس</span>
+                </div>
+                <div>
+                  <h4 style={{margin: '0 0 5px 0', color: 'var(--text-main)'}}>بث مباشر: مراجعة الكيمياء</h4>
+                  <div style={{fontSize: '0.85rem', color: 'var(--text-muted)'}}>الساعة 9:00 مساءً</div>
+                </div>
+              </div>
+            </div>
+            
+            <button style={{width: '100%', padding: '10px', marginTop: '20px', backgroundColor: 'transparent', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-md)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 'bold'}}>
+              عرض الجدول الزمني
+            </button>
+          </div>
+
         </div>
 
       </div>
 
-      {/* Bottom Row */}
-      <div className="lightglass-card" style={styles.card}>
-        <h3 style={{marginBottom: '20px', color: 'var(--primary-color)'}}>أحدث المعاملات</h3>
-        <div style={{overflowX: 'auto'}}>
-          <table style={{width: '100%', borderCollapse: 'collapse'}}>
-            <thead>
-              <tr style={{color: 'var(--text-muted)', borderBottom: '1px solid var(--border-color)', textAlign: 'right'}}>
-                <th style={{padding: '12px'}}>التاريخ</th>
-                <th style={{padding: '12px'}}>الوصف</th>
-                <th style={{padding: '12px'}}>القيمة</th>
-                <th style={{padding: '12px'}}>الحالة</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.length === 0 ? (
-                <tr>
-                  <td colSpan="4" style={{textAlign: 'center', padding: '30px', color: 'var(--text-muted)'}}>
-                    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px'}}>
-                      <MdStar size={40} color="#e2e8f0" />
-                      لا توجد معاملات مالية سابقة
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                transactions.map((tx, idx) => (
-                  <tr key={idx} style={{borderBottom: '1px solid var(--border-color)'}}>
-                    <td style={{padding: '12px', color: 'var(--text-main)'}}>{tx.date}</td>
-                    <td style={{padding: '12px', color: 'var(--text-main)'}}>{tx.desc}</td>
-                    <td style={{padding: '12px', color: 'var(--text-main)', fontWeight: 'bold'}}>{tx.amount}</td>
-                    <td style={{padding: '12px', color: 'var(--text-main)'}}>{tx.status}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   );
 }
 
 const styles = {
-  card: {
-    padding: '25px',
-  },
-  calendarRings: {
-    position: 'absolute',
-    top: '-10px',
-    left: '20px',
-    right: '20px',
+  statCard: {
+    padding: '20px',
     display: 'flex',
-    justifyContent: 'space-between'
+    alignItems: 'center',
+    gap: '15px'
   },
-  ring: {
-    width: '12px',
-    height: '24px',
-    border: '3px solid rgba(255,255,255,0.8)',
-    borderRadius: '6px',
-    backgroundColor: 'rgba(255,255,255,0.5)',
-    boxShadow: 'inset 0 0 5px rgba(0,0,0,0.1)'
+  iconBox: {
+    width: '50px',
+    height: '50px',
+    borderRadius: '12px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  statLabel: {
+    fontSize: '0.9rem',
+    color: 'var(--text-muted)',
+    marginBottom: '5px'
+  },
+  statValue: {
+    fontSize: '1.5rem',
+    fontWeight: 'bold',
+    color: 'var(--text-main)'
+  },
+  courseRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '15px',
+    border: '1px solid var(--border-color)',
+    borderRadius: 'var(--radius-md)',
+    transition: 'background-color 0.2s',
+  },
+  playBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '5px',
+    padding: '10px 20px',
+    backgroundColor: 'var(--secondary-color)',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '20px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    boxShadow: '0 2px 5px rgba(255, 183, 3, 0.3)'
+  },
+  taskItem: {
+    display: 'flex',
+    gap: '15px',
+    alignItems: 'center',
+    padding: '10px 0',
+    borderBottom: '1px solid var(--border-color)',
+    borderLeft: '4px solid var(--secondary-color)',
+    paddingLeft: '10px'
+  },
+  taskDate: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f8fafc',
+    borderRadius: '8px',
+    width: '50px',
+    height: '50px',
+    color: 'var(--primary-color)'
   }
 };
