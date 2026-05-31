@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, Outlet } from 'react-router-dom';
+import './student-theme.css'; // Add this import
 import Sidebar from './components/Sidebar';
 import StudentSidebar from './components/StudentSidebar';
 import Header from './components/Header';
@@ -38,7 +39,7 @@ function RoleDashboard() {
 function StudentLayout() {
   const role = localStorage.getItem('userRole') || 'student';
   return (
-    <div className="app-layout" style={{backgroundColor: '#f8fafc'}}>
+    <div className={`app-layout ${role === 'student' ? 'student-theme-dark' : ''}`} style={role !== 'student' ? {backgroundColor: '#f8fafc'} : {}}>
       {role === 'student' ? <StudentSidebar /> : <Sidebar />}
       <div className="main-content">
         <Header />

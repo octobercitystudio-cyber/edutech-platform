@@ -75,48 +75,48 @@ export default function Dashboard() {
       <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '20px'}}>
         
         {/* Calendar Card */}
-        <div style={{...styles.card, textAlign: 'center', position: 'relative', overflow: 'hidden'}}>
+        <div className="glass-card" style={{...styles.card, textAlign: 'center', position: 'relative', overflow: 'hidden'}}>
           <div style={styles.calendarRings}>
             {[...Array(9)].map((_, i) => <div key={i} style={styles.ring}></div>)}
           </div>
-          <div style={{marginTop: '25px', color: 'var(--primary-color)'}}>
+          <div style={{marginTop: '25px', color: 'var(--cyan-accent)', textShadow: '0 0 10px var(--cyan-glow)'}}>
             <MdCalendarToday size={40} />
           </div>
-          <h2 style={{color: '#1e293b', fontSize: '1.2rem', marginTop: '10px'}}>{currentMonth}</h2>
-          <div style={{fontSize: '3rem', fontWeight: 'bold', color: 'var(--secondary-color)'}}>
+          <h2 style={{fontSize: '1.2rem', marginTop: '10px'}}>{currentMonth}</h2>
+          <div style={{fontSize: '3rem', fontWeight: 'bold', color: 'var(--secondary-color)', textShadow: '0 0 10px var(--secondary-glow)'}}>
             {currentDay}
           </div>
-          <p style={{color: '#64748b', fontSize: '0.9rem', marginTop: '5px'}}>لديك مهمتان اليوم</p>
+          <p style={{color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '5px'}}>لديك مهمتان اليوم</p>
         </div>
 
         {/* Rank Card */}
-        <div style={{...styles.card, textAlign: 'center'}}>
-          <h2 style={{color: '#1e293b', marginBottom: '15px', fontSize: '1.2rem'}}>ترتيبك هذا الأسبوع</h2>
+        <div className="glass-card" style={{...styles.card, textAlign: 'center'}}>
+          <h2 style={{marginBottom: '15px', fontSize: '1.2rem'}}>ترتيبك هذا الأسبوع</h2>
           <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px'}}>
             <div style={{
               width: '80px', height: '80px', borderRadius: '50%', 
-              backgroundColor: '#fffbeb', border: '4px solid #fcd34d',
+              backgroundColor: 'rgba(255, 183, 3, 0.1)', border: '2px solid var(--secondary-color)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 10px rgba(252, 211, 77, 0.3)'
+              boxShadow: '0 0 15px var(--secondary-glow)'
             }}>
-              <span style={{fontSize: '2rem', fontWeight: 'bold', color: '#b45309'}}>#4</span>
+              <span style={{fontSize: '2rem', fontWeight: 'bold', color: 'var(--secondary-color)', textShadow: '0 0 5px var(--secondary-glow)'}}>#4</span>
             </div>
           </div>
-          <div style={{marginTop: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', color: '#10b981'}}>
+          <div style={{marginTop: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', color: 'var(--cyan-accent)'}}>
             <MdTrendingUp />
             <span>متقدم بـ 2 مركز عن الأسبوع الماضي!</span>
           </div>
         </div>
 
         {/* Welcome Card */}
-        <div style={{...styles.card, backgroundColor: 'var(--primary-color)', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '30px'}}>
+        <div className="glass-card" style={{...styles.card, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '30px', border: '1px solid var(--primary-glow)', boxShadow: '0 0 20px rgba(15, 76, 129, 0.2)'}}>
           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
-            <div style={{fontSize: '2.5rem'}}>🎓</div>
+            <div style={{fontSize: '2.5rem', textShadow: '0 0 10px rgba(255,255,255,0.5)'}}>🎓</div>
             <h2 style={{margin: 0, fontSize: '2rem', direction: 'ltr'}}>{userName} ,مرحباً</h2>
           </div>
           <div>
             <h3 style={{margin: '0 0 10px 0', fontSize: '1.2rem', fontWeight: 'normal', opacity: 0.9}}>جاهز لرحلة تفوق جديدة اليوم؟</h3>
-            <div style={{display: 'inline-block', backgroundColor: 'rgba(255,255,255,0.2)', padding: '5px 15px', borderRadius: '20px', fontSize: '0.9rem'}}>
+            <div style={{display: 'inline-block', backgroundColor: 'rgba(255,255,255,0.1)', border: '1px solid var(--glass-border)', padding: '5px 15px', borderRadius: '20px', fontSize: '0.9rem'}}>
               الرصيد: {walletBalance} ج.م
             </div>
           </div>
@@ -128,30 +128,30 @@ export default function Dashboard() {
       <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px', marginBottom: '20px'}}>
         
         {/* Line Chart */}
-        <div style={styles.card}>
-          <h3 style={{color: '#1e293b', textAlign: 'center', marginBottom: '20px'}}>معدل التعلم (الساعات)</h3>
+        <div className="glass-card" style={styles.card}>
+          <h3 style={{textAlign: 'center', marginBottom: '20px'}}>معدل التعلم (الساعات)</h3>
           <div style={{height: '250px'}}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={lineData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} />
-                <RechartsTooltip />
-                <Area type="monotone" dataKey="value" stroke="var(--primary-color)" fill="var(--primary-color)" fillOpacity={0.2} strokeWidth={3} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: 'var(--text-muted)'}} />
+                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: 'var(--text-muted)'}} />
+                <RechartsTooltip contentStyle={{backgroundColor: 'rgba(15,23,42,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff'}} />
+                <Area type="monotone" dataKey="value" stroke="var(--cyan-accent)" fill="var(--cyan-glow)" fillOpacity={0.4} strokeWidth={3} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Donut Chart */}
-        <div style={styles.card}>
-          <h3 style={{color: '#1e293b', textAlign: 'center', marginBottom: '20px'}}>توزيع الأنشطة</h3>
+        <div className="glass-card" style={styles.card}>
+          <h3 style={{textAlign: 'center', marginBottom: '20px'}}>توزيع الأنشطة</h3>
           <div style={{display: 'flex', alignItems: 'center', height: '250px'}}>
             
-            <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '1rem', color: '#64748b', textAlign: 'right', alignItems: 'flex-end'}}>
+            <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '1rem', color: 'var(--text-muted)', textAlign: 'right', alignItems: 'flex-end'}}>
               {pieData.map((entry, idx) => (
                 <div key={idx} style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                  {entry.name} <span style={{width: '12px', height: '12px', borderRadius: '50%', backgroundColor: entry.color}}></span>
+                  {entry.name} <span style={{width: '12px', height: '12px', borderRadius: '50%', backgroundColor: entry.color, boxShadow: `0 0 8px ${entry.color}`}}></span>
                 </div>
               ))}
             </div>
@@ -159,7 +159,7 @@ export default function Dashboard() {
             <div style={{flex: 1, height: '100%'}}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={pieData} innerRadius={70} outerRadius={90} paddingAngle={2} dataKey="value" stroke="none">
+                  <Pie data={pieData} innerRadius={70} outerRadius={90} paddingAngle={2} dataKey="value" stroke="rgba(255,255,255,0.05)">
                     {pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
@@ -173,8 +173,8 @@ export default function Dashboard() {
       </div>
 
       {/* Bottom Row */}
-      <div style={styles.card}>
-        <h3 style={{color: '#1e293b', marginBottom: '20px'}}>أحدث المعاملات</h3>
+      <div className="glass-card" style={styles.card}>
+        <h3 style={{marginBottom: '20px'}}>أحدث المعاملات</h3>
         <div style={{overflowX: 'auto'}}>
           <table style={{width: '100%', borderCollapse: 'collapse'}}>
             <thead>
@@ -215,11 +215,7 @@ export default function Dashboard() {
 
 const styles = {
   card: {
-    backgroundColor: '#ffffff',
-    borderRadius: '16px',
-    boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
     padding: '25px',
-    border: '1px solid #f8fafc'
   },
   calendarRings: {
     position: 'absolute',
@@ -232,8 +228,9 @@ const styles = {
   ring: {
     width: '12px',
     height: '24px',
-    border: '3px solid #cbd5e1',
+    border: '2px solid rgba(255,255,255,0.2)',
     borderRadius: '6px',
-    backgroundColor: '#f8fafc'
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    boxShadow: 'inset 0 0 5px rgba(0,0,0,0.5)'
   }
 };
