@@ -62,7 +62,7 @@ export default function AdminDashboard() {
           <h1 style={{color: 'var(--primary-color)', margin: '0 0 10px 0'}}>لوحة تحكم الإدارة</h1>
           <p className="text-muted" style={{margin: 0}}>نظرة عامة حية على إحصائيات النظام ومؤشرات الأداء.</p>
         </div>
-        <button className="btn btn-secondary" style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+        <button className="btn btn-secondary" style={{display: 'flex', alignItems: 'center', gap: '10px'}} onClick={() => window.location.href = '/settings'}>
           <MdSettings size={24} /> إعدادات النظام
         </button>
       </div>

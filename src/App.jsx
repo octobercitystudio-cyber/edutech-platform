@@ -30,6 +30,8 @@ import StudentReports from './pages/StudentReports';
 import Support from './pages/Support';
 import Settings from './pages/Settings';
 
+import AdminSettings from './pages/AdminSettings';
+
 function RoleDashboard() {
   const role = localStorage.getItem('userRole') || 'student';
   if (role === 'admin') return <AdminDashboard />;
@@ -37,6 +39,12 @@ function RoleDashboard() {
   if (role === 'assistant') return <AssistantDashboard />;
   if (role === 'parent') return <ParentDashboard />;
   return <Dashboard />;
+}
+
+function RoleSettings() {
+  const role = localStorage.getItem('userRole') || 'student';
+  if (role === 'admin') return <AdminSettings />;
+  return <Settings />;
 }
 
 function StudentLayout() {
@@ -131,7 +139,7 @@ function App() {
         <Route path="/live" element={<LiveSessions />} />
         <Route path="/reports" element={<StudentReports />} />
         <Route path="/support" element={<Support />} />
-        <Route path="/settings" element={<Settings />} />
+        <Route path="/settings" element={<RoleSettings />} />
       </Route>
       
       <Route path="*" element={<div style={{padding: '50px', textAlign: 'center'}}>صفحة غير موجودة</div>} />
