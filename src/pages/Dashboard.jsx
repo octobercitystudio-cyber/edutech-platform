@@ -73,7 +73,7 @@ export default function Dashboard() {
       <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '20px'}}>
         
         {/* Calendar Card */}
-        <div className="branded-card" style={{...styles.card, textAlign: 'center', position: 'relative', overflow: 'hidden'}}>
+        <div className="lightglass-card" style={{...styles.card, textAlign: 'center', position: 'relative', overflow: 'hidden'}}>
           <div style={styles.calendarRings}>
             {[...Array(9)].map((_, i) => <div key={i} style={styles.ring}></div>)}
           </div>
@@ -88,12 +88,12 @@ export default function Dashboard() {
         </div>
 
         {/* Rank Card */}
-        <div className="branded-card" style={{...styles.card, textAlign: 'center'}}>
+        <div className="lightglass-card" style={{...styles.card, textAlign: 'center'}}>
           <h2 style={{marginBottom: '15px', fontSize: '1.2rem', color: 'var(--primary-color)'}}>ترتيبك هذا الأسبوع</h2>
           <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px'}}>
             <div style={{
               width: '80px', height: '80px', borderRadius: '50%', 
-              backgroundColor: '#fffbeb', border: '3px solid var(--secondary-color)',
+              backgroundColor: 'rgba(255, 183, 3, 0.1)', border: '3px solid var(--secondary-color)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: '0 4px 10px rgba(255, 183, 3, 0.2)'
             }}>
@@ -107,7 +107,7 @@ export default function Dashboard() {
         </div>
 
         {/* Welcome Card */}
-        <div className="branded-card" style={{...styles.card, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '30px', backgroundColor: 'var(--primary-color)', color: '#ffffff'}}>
+        <div className="lightglass-card" style={{...styles.card, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '30px', backgroundColor: 'rgba(15, 76, 129, 0.85)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.3)'}}>
           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
             <div style={{fontSize: '2.5rem', color: 'var(--secondary-color)'}}>🎓</div>
             <h2 style={{margin: 0, fontSize: '2rem', direction: 'ltr', color: '#fff'}}>{userName} ,مرحباً</h2>
@@ -126,15 +126,15 @@ export default function Dashboard() {
       <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px', marginBottom: '20px'}}>
         
         {/* Line Chart */}
-        <div className="branded-card" style={styles.card}>
+        <div className="lightglass-card" style={styles.card}>
           <h3 style={{textAlign: 'center', marginBottom: '20px', color: 'var(--primary-color)'}}>معدل التعلم (الساعات)</h3>
           <div style={{height: '250px'}}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={lineData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(15, 76, 129, 0.1)" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: 'var(--text-muted)'}} />
                 <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: 'var(--text-muted)'}} />
-                <RechartsTooltip contentStyle={{backgroundColor: '#fff', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)', boxShadow: '0 4px 10px rgba(0,0,0,0.05)'}} />
+                <RechartsTooltip contentStyle={{backgroundColor: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.5)', borderRadius: '8px', color: 'var(--text-main)', boxShadow: '0 4px 10px rgba(0,0,0,0.05)'}} />
                 <Area type="monotone" dataKey="value" stroke="var(--primary-color)" fill="var(--primary-color)" fillOpacity={0.1} strokeWidth={3} />
               </AreaChart>
             </ResponsiveContainer>
@@ -142,7 +142,7 @@ export default function Dashboard() {
         </div>
 
         {/* Donut Chart */}
-        <div className="branded-card" style={styles.card}>
+        <div className="lightglass-card" style={styles.card}>
           <h3 style={{textAlign: 'center', marginBottom: '20px', color: 'var(--primary-color)'}}>توزيع الأنشطة</h3>
           <div style={{display: 'flex', alignItems: 'center', height: '250px'}}>
             
@@ -171,7 +171,7 @@ export default function Dashboard() {
       </div>
 
       {/* Bottom Row */}
-      <div className="branded-card" style={styles.card}>
+      <div className="lightglass-card" style={styles.card}>
         <h3 style={{marginBottom: '20px', color: 'var(--primary-color)'}}>أحدث المعاملات</h3>
         <div style={{overflowX: 'auto'}}>
           <table style={{width: '100%', borderCollapse: 'collapse'}}>
@@ -226,8 +226,9 @@ const styles = {
   ring: {
     width: '12px',
     height: '24px',
-    border: '3px solid #e2e8f0',
+    border: '3px solid rgba(255,255,255,0.8)',
     borderRadius: '6px',
-    backgroundColor: '#f8fafc',
+    backgroundColor: 'rgba(255,255,255,0.5)',
+    boxShadow: 'inset 0 0 5px rgba(0,0,0,0.1)'
   }
 };

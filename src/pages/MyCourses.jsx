@@ -74,28 +74,28 @@ export default function MyCourses() {
             </div>
             
             <div style={{display: 'flex', gap: '20px', flexWrap: 'wrap'}}>
-              <div className="branded-card" style={styles.statCard}>
+              <div className="lightglass-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>لم تبدأ</div>
                   <div style={styles.statValue}>0</div>
                 </div>
                 <div style={styles.lightIcon}><MdPlayArrow /></div>
               </div>
-              <div className="branded-card" style={styles.statCard}>
+              <div className="lightglass-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>غياب</div>
                   <div style={styles.statValue}>0</div>
                 </div>
                 <div style={styles.lightIcon}><MdClose /></div>
               </div>
-              <div className="branded-card" style={styles.statCard}>
+              <div className="lightglass-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>حضور</div>
                   <div style={styles.statValue}>0</div>
                 </div>
                 <div style={styles.lightIcon}><MdCheck /></div>
               </div>
-              <div className="branded-card" style={styles.statCard}>
+              <div className="lightglass-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>تم التسجيل</div>
                   <div style={styles.statValue}>0</div>
@@ -114,28 +114,28 @@ export default function MyCourses() {
             </div>
             
             <div style={{display: 'flex', gap: '20px', flexWrap: 'wrap'}}>
-              <div className="branded-card" style={styles.statCard}>
+              <div className="lightglass-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>لم يبدأ</div>
                   <div style={styles.statValue}>0</div>
                 </div>
                 <div style={styles.lightIcon}><MdPlayArrow /></div>
               </div>
-              <div className="branded-card" style={styles.statCard}>
+              <div className="lightglass-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>فشل الاختبار</div>
                   <div style={styles.statValue}>0</div>
                 </div>
                 <div style={styles.lightIcon}><MdClose /></div>
               </div>
-              <div className="branded-card" style={styles.statCard}>
+              <div className="lightglass-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>تم الاجتياز</div>
                   <div style={styles.statValue}>0</div>
                 </div>
                 <div style={styles.lightIcon}><MdCheck /></div>
               </div>
-              <div className="branded-card" style={styles.statCard}>
+              <div className="lightglass-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>متوسط درجة</div>
                   <div style={styles.statValue}>0.0%</div>
@@ -165,21 +165,21 @@ export default function MyCourses() {
             </div>
             
             <div style={{display: 'flex', gap: '20px', flexWrap: 'wrap'}}>
-              <div className="branded-card" style={{...styles.statCard, flex: '1.5'}}>
+              <div className="lightglass-card" style={{...styles.statCard, flex: '1.5'}}>
                 <div>
                   <div style={styles.statLabel}>وقت التعلم</div>
                   <div style={styles.statValue}>0 دقيقة</div>
                 </div>
                 <div style={styles.lightIcon}><MdCheckCircle /></div>
               </div>
-              <div className="branded-card" style={styles.statCard}>
+              <div className="lightglass-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>مكتمل</div>
                   <div style={styles.statValue}>0</div>
                 </div>
                 <div style={styles.lightIcon}><MdCheck /></div>
               </div>
-              <div className="branded-card" style={styles.statCard}>
+              <div className="lightglass-card" style={styles.statCard}>
                 <div>
                   <div style={styles.statLabel}>غياب</div>
                   <div style={styles.statValue}>0</div>
@@ -201,25 +201,25 @@ export default function MyCourses() {
             <div style={{flex: '2 1 500px', display: 'flex', flexDirection: 'column', gap: '20px'}}>
               
               <div style={{display: 'flex', gap: '20px'}}>
-                <div className="branded-card" style={{flex: 1, padding: '20px', textAlign: 'center'}}>
+                <div className="lightglass-card" style={{flex: 1, padding: '20px', textAlign: 'center'}}>
                   <h4 style={{margin: '0 0 15px 0', color: 'var(--text-muted)'}}>نسبة الإنجاز (Progress)</h4>
                   <div style={{...styles.circleProgress, borderColor: 'var(--primary-color)', color: 'var(--primary-color)'}}>{selectedCourse.attendance}%</div>
                 </div>
-                <div className="branded-card" style={{flex: 1, padding: '20px', textAlign: 'center'}}>
+                <div className="lightglass-card" style={{flex: 1, padding: '20px', textAlign: 'center'}}>
                   <h4 style={{margin: '0 0 15px 0', color: 'var(--text-muted)'}}>متوسط الدرجة</h4>
                   <div style={{...styles.circleProgress, borderColor: 'var(--secondary-color)', color: 'var(--secondary-color)'}}>{selectedCourse.avgGrade}%</div>
                 </div>
               </div>
 
-              <div className="branded-card" style={{padding: '20px'}}>
+              <div className="lightglass-card" style={{padding: '20px'}}>
                 <h4 style={{margin: '0 0 15px 0', color: 'var(--text-muted)', textAlign: 'right'}}>وحدات مكتملة</h4>
                 <div style={{height: '200px'}}>
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={lineData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.5)" />
                       <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: 'var(--text-muted)'}} />
                       <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: 'var(--text-muted)'}} ticks={[1, 2, 3]} />
-                      <RechartsTooltip contentStyle={{backgroundColor: '#fff', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)', boxShadow: '0 4px 10px rgba(0,0,0,0.05)'}} />
+                      <RechartsTooltip contentStyle={{backgroundColor: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.5)', borderRadius: '8px', color: 'var(--text-main)', boxShadow: '0 4px 10px rgba(0,0,0,0.05)'}} />
                       <Area type="linear" dataKey="value" stroke="var(--primary-color)" fill="var(--primary-color)" fillOpacity={0.1} strokeWidth={3} />
                     </AreaChart>
                   </ResponsiveContainer>
@@ -230,8 +230,8 @@ export default function MyCourses() {
 
             <div style={{flex: '1 1 250px', display: 'flex', flexDirection: 'column', gap: '20px'}}>
               
-              <div className="branded-card" style={{overflow: 'hidden'}}>
-                <div style={{backgroundColor: '#f8fafc', color: 'var(--text-main)', padding: '15px', textAlign: 'center', fontWeight: 'bold', borderBottom: '1px solid var(--border-color)'}}>
+              <div className="lightglass-card" style={{overflow: 'hidden'}}>
+                <div style={{backgroundColor: 'rgba(255,255,255,0.3)', color: 'var(--text-main)', padding: '15px', textAlign: 'center', fontWeight: 'bold', borderBottom: '1px solid rgba(255,255,255,0.5)'}}>
                   {selectedCourse.type}
                 </div>
                 <div style={{padding: '30px 20px', textAlign: 'center'}}>
@@ -264,13 +264,13 @@ export default function MyCourses() {
         {!selectedCourse && (
           <div style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
             {!loading && myCourses.length === 0 ? (
-              <div className="branded-card" style={{textAlign: 'center', padding: '60px', backgroundColor: '#fff'}}>
+              <div className="lightglass-card" style={{textAlign: 'center', padding: '60px'}}>
                 <MdMenuBook size={60} color="#cbd5e1" />
                 <h3 style={{color: 'var(--text-muted)', marginTop: '15px', fontWeight: 'bold'}}>أنت لست مشتركاً في أي كورس حالياً.</h3>
               </div>
             ) : (
               myCourses.map(course => (
-                <div key={course.id} className="branded-card" style={styles.courseItemCard}>
+                <div key={course.id} className="lightglass-card" style={styles.courseItemCard}>
                   <div style={{display: 'flex', alignItems: 'center', gap: '20px', flex: 1, justifyContent: 'flex-end'}}>
                     <div style={{textAlign: 'right'}}>
                       <h3 style={{margin: 0, fontSize: '1.2rem', color: 'var(--primary-color)', fontWeight: 'bold'}}>{course.title}</h3>
@@ -293,7 +293,7 @@ export default function MyCourses() {
 
         {/* Course Details */}
         {selectedCourse && (
-          <div className="branded-card" style={styles.card}>
+          <div className="lightglass-card" style={styles.card}>
             {/* Header Tabs */}
             <div style={styles.tabsContainer}>
               <span 
@@ -318,7 +318,7 @@ export default function MyCourses() {
       </div>
 
       {/* Achievements Sidebar */}
-      <div className="branded-card" style={styles.achievementsSidebar}>
+      <div className="lightglass-card" style={styles.achievementsSidebar}>
         <h3 style={{textAlign: 'center', margin: '0 0 30px 0', color: 'var(--primary-color)', fontSize: '1.2rem', fontWeight: 'bold'}}>انجازاتي</h3>
         
         <div style={styles.achievementItem}>
