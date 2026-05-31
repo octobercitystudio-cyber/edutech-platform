@@ -67,12 +67,9 @@ export default function Sidebar() {
             <Link 
               key={item.path} 
               to={item.path} 
-              style={{
-                ...styles.link,
-                ...(isActive ? styles.activeLink : {})
-              }}
+              className={`sidebar-link ${isActive ? 'active' : ''}`}
             >
-              <span style={styles.icon}>{item.icon}</span>
+              <span className="sidebar-icon">{item.icon}</span>
               {item.name}
             </Link>
           );

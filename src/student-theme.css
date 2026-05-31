@@ -31,23 +31,35 @@
   font-weight: bold;
 }
 
-.student-theme-branded aside ul li {
+/* Sidebar Links */
+.student-theme-branded aside .sidebar-link {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
   color: #ffffff !important;
+  font-size: 1.1rem;
+  font-weight: bold;
   transition: all 0.2s ease;
+  text-decoration: none;
   border-radius: 8px;
-  margin: 5px 10px;
+  margin: 5px 15px;
 }
 
-.student-theme-branded aside ul li.active {
+.student-theme-branded aside .sidebar-link.active {
   background-color: #ffffff !important;
   color: var(--primary-color) !important;
   border-right: 4px solid var(--secondary-color) !important;
-  font-weight: bold;
 }
 
-.student-theme-branded aside ul li:hover:not(.active) {
-  background-color: rgba(255, 255, 255, 0.05) !important;
+.student-theme-branded aside .sidebar-link:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.1) !important;
   color: #ffffff !important;
+}
+
+.student-theme-branded aside .sidebar-icon {
+  margin-left: 15px;
+  font-size: 1.4rem;
+  display: flex;
 }
 
 /* Header Overrides */
