@@ -3,10 +3,10 @@ import { supabase } from '../supabaseClient';
 import { MdAccountBalanceWallet, MdAdd } from 'react-icons/md';
 
 export default function AdminFinances() {
-  const [wallets, setWallets] = useState([]);
+  const [studentWallets, setStudentWallets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [rechargeAmount, setRechargeAmount] = useState('');
-  const [selectedWalletId, setSelectedWalletId] = useState(null);
+  const [selectedStudentId, setSelectedStudentId] = useState(null);
 
   useEffect(() => {
     fetchWallets();
@@ -15,16 +15,35 @@ export default function AdminFinances() {
   const fetchWallets = async () => {
     try {
       setLoading(true);
-      // Join wallet with profiles to get student names
-      const { data, error } = await supabase
+      
+      // Fetch all students
+      const { data: students, error: studentsError } = await supabase
+        .from('profiles')
+        .select('id, name, email')
+        .eq('role', 'student');
+
+      if (studentsError) throw studentsError;
+
+      // Fetch all wallets
+      const { data: wallets, error: walletsError } = await supabase
         .from('wallet')
-        .select(`
-          id,
-          balance,
-          student_id,
-          profiles!inner(name, email)
-        `);
-      if (data) setWallets(data);
+        .select('id, balance, student_id');
+
+      if (walletsError) throw walletsError;
+
+      // Merge
+      const merged = (students || []).map(student => {
+        const wallet = wallets?.find(w => w.student_id === student.id);
+        return {
+          student_id: student.id,
+          name: student.name,
+          email: student.email,
+          wallet_id: wallet?.id || null,
+          balance: wallet?.balance || 0
+        };
+      });
+
+      setStudentWallets(merged);
     } catch (err) {
       console.error(err);
     } finally {
@@ -32,31 +51,50 @@ export default function AdminFinances() {
     }
   };
 
-  const handleRecharge = async (walletId, currentBalance) => {
+  const handleRecharge = async (student) => {
     if (!rechargeAmount || isNaN(rechargeAmount)) {
       alert('يرجى إدخال مبلغ صحيح');
       return;
     }
     
     const amount = parseFloat(rechargeAmount);
-    const newBalance = currentBalance + amount;
+    const newBalance = student.balance + amount;
 
     try {
-      const { error } = await supabase
-        .from('wallet')
-        .update({ balance: newBalance })
-        .eq('id', walletId);
+      if (student.wallet_id) {
+        // Update existing wallet
+        const { error } = await supabase
+          .from('wallet')
+          .update({ balance: newBalance })
+          .eq('id', student.wallet_id);
+          
+        if (error) throw error;
         
-      if (!error) {
-        setWallets(wallets.map(w => w.id === walletId ? { ...w, balance: newBalance } : w));
-        setSelectedWalletId(null);
-        setRechargeAmount('');
-        alert('تم شحن الرصيد بنجاح!');
+        setStudentWallets(studentWallets.map(s => 
+          s.student_id === student.student_id ? { ...s, balance: newBalance } : s
+        ));
       } else {
-        alert('حدث خطأ أثناء الشحن');
+        // Insert new wallet
+        const { data, error } = await supabase
+          .from('wallet')
+          .insert([{ student_id: student.student_id, balance: newBalance }])
+          .select();
+          
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          setStudentWallets(studentWallets.map(s => 
+            s.student_id === student.student_id ? { ...s, balance: newBalance, wallet_id: data[0].id } : s
+          ));
+        }
       }
+      
+      setSelectedStudentId(null);
+      setRechargeAmount('');
+      alert('تم شحن الرصيد بنجاح!');
     } catch (err) {
       console.error(err);
+      alert('حدث خطأ أثناء الشحن');
     }
   };
 
@@ -68,7 +106,7 @@ export default function AdminFinances() {
           <MdAccountBalanceWallet size={24} color="var(--primary-color)" />
           <span style={{fontWeight: 'bold'}}>إجمالي الأرصدة:</span>
           <span style={{color: 'var(--secondary-color)', fontSize: '1.2rem', fontWeight: 'bold'}}>
-            {wallets.reduce((sum, w) => sum + w.balance, 0)} ج.م
+            {studentWallets.reduce((sum, s) => sum + s.balance, 0)} ج.م
           </span>
         </div>
       </div>
@@ -90,16 +128,16 @@ export default function AdminFinances() {
                 </tr>
               </thead>
               <tbody>
-                {wallets.length === 0 ? (
-                  <tr><td colSpan="4" style={{textAlign: 'center', padding: '20px'}}>لا توجد محافظ</td></tr>
+                {studentWallets.length === 0 ? (
+                  <tr><td colSpan="4" style={{textAlign: 'center', padding: '20px'}}>لا يوجد طلاب مسجلين</td></tr>
                 ) : (
-                  wallets.map(wallet => (
-                    <tr key={wallet.id} style={{borderBottom: '1px solid var(--border-color)'}}>
-                      <td style={{padding: '15px', fontWeight: 'bold'}}>{wallet.profiles?.name || 'غير معروف'}</td>
-                      <td style={{padding: '15px', color: 'var(--text-muted)'}}>{wallet.profiles?.email || 'غير معروف'}</td>
-                      <td style={{padding: '15px', fontWeight: 'bold', color: 'var(--secondary-color)', fontSize: '1.1rem'}}>{wallet.balance} ج.م</td>
+                  studentWallets.map(student => (
+                    <tr key={student.student_id} style={{borderBottom: '1px solid var(--border-color)'}}>
+                      <td style={{padding: '15px', fontWeight: 'bold'}}>{student.name || 'غير معروف'}</td>
+                      <td style={{padding: '15px', color: 'var(--text-muted)'}}>{student.email || 'غير متوفر'}</td>
+                      <td style={{padding: '15px', fontWeight: 'bold', color: 'var(--secondary-color)', fontSize: '1.1rem'}}>{student.balance} ج.م</td>
                       <td style={{padding: '15px', textAlign: 'center'}}>
-                        {selectedWalletId === wallet.id ? (
+                        {selectedStudentId === student.student_id ? (
                           <div style={{display: 'flex', justifyContent: 'center', gap: '5px'}}>
                             <input 
                               type="number" 
@@ -108,14 +146,14 @@ export default function AdminFinances() {
                               placeholder="المبلغ"
                               style={{padding: '5px', width: '80px', borderRadius: '5px', border: '1px solid var(--border-color)'}}
                             />
-                            <button className="btn btn-primary" style={{padding: '5px 10px'}} onClick={() => handleRecharge(wallet.id, wallet.balance)}>شحن</button>
-                            <button className="btn btn-outline" style={{padding: '5px 10px'}} onClick={() => setSelectedWalletId(null)}>إلغاء</button>
+                            <button className="btn btn-primary" style={{padding: '5px 10px'}} onClick={() => handleRecharge(student)}>شحن</button>
+                            <button className="btn btn-outline" style={{padding: '5px 10px'}} onClick={() => setSelectedStudentId(null)}>إلغاء</button>
                           </div>
                         ) : (
                           <button 
                             className="btn btn-outline" 
                             style={{display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '5px 15px'}}
-                            onClick={() => setSelectedWalletId(wallet.id)}
+                            onClick={() => setSelectedStudentId(student.student_id)}
                           >
                             <MdAdd /> شحن رصيد
                           </button>

@@ -8,6 +8,13 @@ export default function AdminUsers() {
   const [editingUserId, setEditingUserId] = useState(null);
   const [editRole, setEditRole] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newUser, setNewUser] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    role: 'student'
+  });
 
   useEffect(() => {
     fetchUsers();
@@ -26,6 +33,37 @@ export default function AdminUsers() {
       console.error('Error fetching users:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+    try {
+      // For MVP, we insert directly into profiles with a mock UUID
+      // In production, this would use Supabase Admin API to create auth user first
+      const mockId = 'mock-' + Date.now();
+      const { data, error } = await supabase
+        .from('profiles')
+        .insert([{
+          id: mockId,
+          name: newUser.name,
+          email: newUser.email,
+          phone: newUser.phone,
+          role: newUser.role
+        }])
+        .select();
+
+      if (error) throw error;
+      
+      if (data) {
+        setUsers([data[0], ...users]);
+        setShowAddModal(false);
+        setNewUser({ name: '', email: '', phone: '', role: 'student' });
+        alert('تمت إضافة المستخدم بنجاح!');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('حدث خطأ أثناء إضافة المستخدم');
     }
   };
 
@@ -81,17 +119,61 @@ export default function AdminUsers() {
     <div className="fade-in container" style={{padding: 'var(--space-6) 0'}}>
       <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '15px'}}>
         <h1 style={{color: 'var(--primary-color)', margin: 0}}>إدارة المستخدمين والصلاحيات</h1>
-        <div style={{position: 'relative', width: '300px'}}>
-          <input 
-            type="text" 
-            placeholder="البحث بالاسم، الهاتف، أو الإيميل..." 
-            className="form-control"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{paddingRight: '15px'}}
-          />
+        
+        <div style={{display: 'flex', gap: '15px', alignItems: 'center'}}>
+          <div style={{position: 'relative', width: '250px'}}>
+            <input 
+              type="text" 
+              placeholder="البحث بالاسم أو الهاتف..." 
+              className="form-control"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+            + إضافة مستخدم
+          </button>
         </div>
       </div>
+
+      {showAddModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
+          backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 9999, 
+          display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }}>
+          <div className="card fade-in" style={{width: '90%', maxWidth: '500px', padding: '30px', position: 'relative'}}>
+            <button 
+              onClick={() => setShowAddModal(false)}
+              style={{position: 'absolute', top: '20px', left: '20px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem'}}
+            >
+              <MdClose />
+            </button>
+            
+            <h2 style={{color: 'var(--primary-color)', marginTop: 0}}>إضافة مستخدم جديد</h2>
+            <form onSubmit={handleAddUser} style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
+              <input type="text" placeholder="الاسم الكامل" required className="form-control" 
+                value={newUser.name} onChange={e => setNewUser({...newUser, name: e.target.value})} />
+              
+              <input type="email" placeholder="البريد الإلكتروني" required className="form-control" 
+                value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} />
+              
+              <input type="tel" placeholder="رقم الهاتف" required className="form-control" 
+                value={newUser.phone} onChange={e => setNewUser({...newUser, phone: e.target.value})} />
+              
+              <select className="form-control" required value={newUser.role} onChange={e => setNewUser({...newUser, role: e.target.value})}>
+                <option value="student">طالب</option>
+                <option value="teacher">معلم</option>
+                <option value="assistant">مساعد معلم</option>
+                <option value="parent">ولي أمر</option>
+                <option value="admin">مدير (أدمن)</option>
+              </select>
+                
+              <button type="submit" className="btn btn-primary" style={{marginTop: '10px'}}>إضافة المستخدم</button>
+            </form>
+          </div>
+        </div>
+      )}
       
       <div className="card" style={{padding: 'var(--space-6)'}}>
         {loading ? (
