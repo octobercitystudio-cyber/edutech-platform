@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { MdEmail, MdLockOutline, MdPerson, MdPhone } from 'react-icons/md';
+import { supabase } from '../supabaseClient';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -18,29 +19,56 @@ export default function Register() {
     const password = e.target[8].value;
 
     try {
-      const res = await fetch('http://localhost:3000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, parentPhone, grade, governorate, gender, email, password })
+      // 1. Sign up user in Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
       });
-      const data = await res.json();
-      if (data.success) {
-        localStorage.setItem('userId', data.user.id);
-        localStorage.setItem('userName', data.user.name);
-        localStorage.setItem('userEmail', data.user.email);
-        localStorage.setItem('userRole', data.user.role);
-        if (data.sessionToken) {
-          localStorage.setItem('sessionToken', data.sessionToken);
-        }
-        
-        alert(data.message);
-        const from = location.state?.from || '/dashboard';
-        navigate(from);
-      } else {
-        alert(data.message);
+
+      if (authError) {
+        alert('خطأ في إنشاء الحساب: ' + authError.message);
+        return;
       }
+
+      // 2. Insert extra user details into 'profiles' table
+      const user = authData.user;
+      if (user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            { 
+              id: user.id, 
+              name, 
+              phone, 
+              parent_phone: parentPhone, 
+              grade, 
+              governorate, 
+              gender, 
+              email,
+              role: 'student'
+            }
+          ]);
+
+        if (profileError) {
+          console.error("Profile Error:", profileError);
+          // If inserting profile fails, we might still have the auth user, but let's notify
+          alert('تم إنشاء الحساب ولكن حدث خطأ في حفظ البيانات الإضافية.');
+        } else {
+          // Success
+          localStorage.setItem('userId', user.id);
+          localStorage.setItem('userName', name);
+          localStorage.setItem('userEmail', email);
+          localStorage.setItem('userRole', 'student');
+          
+          alert('تم إنشاء الحساب بنجاح!');
+          const from = location.state?.from || '/dashboard';
+          navigate(from);
+        }
+      }
+
     } catch (err) {
-      alert('خطأ في الاتصال بالخادم');
+      alert('خطأ في الاتصال بقاعدة البيانات');
+      console.error(err);
     }
   };
 

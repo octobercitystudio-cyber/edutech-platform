@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { MdEmail, MdLockOutline } from 'react-icons/md';
+import { supabase } from '../supabaseClient';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -12,35 +13,45 @@ export default function Login() {
     const password = e.target[1].value;
 
     try {
-      let deviceId = localStorage.getItem('deviceId');
-      if (!deviceId) {
-        deviceId = 'device_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('deviceId', deviceId);
+      // 1. Sign in with Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError) {
+        alert('البريد الإلكتروني أو كلمة المرور غير صحيحة.');
+        return;
       }
 
-      const res = await fetch('http://localhost:3000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, deviceId })
-      });
-      const data = await res.json();
-      if (data.success) {
-        localStorage.setItem('userId', data.user.id);
-        localStorage.setItem('userName', data.user.name);
-        localStorage.setItem('userEmail', data.user.email);
-        localStorage.setItem('userRole', data.user.role);
-        if (data.sessionToken) {
-          localStorage.setItem('sessionToken', data.sessionToken);
-        }
-        
-        alert(data.message);
-        const from = location.state?.from || '/dashboard';
-        navigate(from);
-      } else {
-        alert(data.message);
+      const user = authData.user;
+      
+      // 2. Fetch user profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) {
+        console.error("Profile Error:", profileError);
+        alert('تم تسجيل الدخول لكن حدث خطأ في جلب بيانات الملف الشخصي.');
+        return;
       }
+
+      // Success
+      localStorage.setItem('userId', user.id);
+      localStorage.setItem('userName', profileData?.name || 'مستخدم');
+      localStorage.setItem('userEmail', email);
+      localStorage.setItem('userRole', profileData?.role || 'student');
+      
+      alert('تم تسجيل الدخول بنجاح!');
+      const from = location.state?.from || '/dashboard';
+      navigate(from);
+      
     } catch (err) {
-      alert('خطأ في الاتصال بالخادم');
+      alert('خطأ في الاتصال بقاعدة البيانات');
+      console.error(err);
     }
   };
 
