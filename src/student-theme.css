@@ -58,17 +58,19 @@
 }
 
 /* Clean Branded Cards */
-.student-theme-branded .branded-card {
-  background-color: var(--surface-color);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+.student-theme-branded .branded-card,
+.student-theme-branded .card {
+  background-color: var(--surface-color) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02) !important;
   transition: all 0.2s ease;
 }
 
-.student-theme-branded .branded-card:hover {
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
-  border-color: rgba(15, 76, 129, 0.1);
+.student-theme-branded .branded-card:hover,
+.student-theme-branded .card:hover {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(15, 76, 129, 0.1) !important;
 }
 
 /* Tables in Branded Theme */
