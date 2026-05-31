@@ -55,9 +55,15 @@ export default function Login() {
     }
   };
 
-  const quickLogin = (email, password) => {
-    document.getElementById('emailInput').value = email;
-    document.getElementById('passwordInput').value = password;
+  const bypassLogin = (role) => {
+    localStorage.setItem('userRole', role);
+    localStorage.setItem('userName', `مستخدم تجريبي`);
+    localStorage.setItem('userId', `mock-${role}-id`);
+    
+    // For admin to bypass dashboard redirect issue
+    const from = location.state?.from || '/dashboard';
+    navigate(from);
+    window.location.reload(); // Ensure layout resets
   };
 
   return (
@@ -92,13 +98,13 @@ export default function Login() {
             </button>
             
             <div style={{marginTop: '20px', padding: '15px', backgroundColor: 'var(--bg-light)', borderRadius: 'var(--radius-md)'}}>
-              <p style={{margin: '0 0 10px 0', fontSize: '0.9rem', color: 'var(--text-muted)', textAlign: 'center'}}>دخول سريع للتجربة (Quick Login)</p>
+              <p style={{margin: '0 0 10px 0', fontSize: '0.9rem', color: 'var(--text-muted)', textAlign: 'center'}}>دخول سريع للتجربة (بدون حساب)</p>
               <div style={{display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap'}}>
-                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => quickLogin('student@alemni.com', '123456')}>حساب طالب</button>
-                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => quickLogin('parent@alemni.com', '123456')}>حساب ولي أمر</button>
-                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => quickLogin('teacher@alemni.com', '123456')}>حساب معلم</button>
-                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => quickLogin('assistant@alemni.com', '123456')}>حساب مساعد</button>
-                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => quickLogin('admin@alemni.com', '123456')}>حساب مدير</button>
+                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => bypassLogin('student')}>حساب طالب</button>
+                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => bypassLogin('parent')}>حساب ولي أمر</button>
+                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => bypassLogin('teacher')}>حساب معلم</button>
+                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => bypassLogin('assistant')}>حساب مساعد</button>
+                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => bypassLogin('admin')}>حساب مدير</button>
               </div>
             </div>
           </form>
