@@ -32,15 +32,15 @@
 }
 
 .student-theme-branded aside ul li {
-  color: rgba(255, 255, 255, 0.7) !important;
+  color: #ffffff !important;
   transition: all 0.2s ease;
   border-radius: 8px;
   margin: 5px 10px;
 }
 
 .student-theme-branded aside ul li.active {
-  background-color: rgba(255, 183, 3, 0.15) !important;
-  color: var(--secondary-color) !important;
+  background-color: #ffffff !important;
+  color: var(--primary-color) !important;
   border-right: 4px solid var(--secondary-color) !important;
   font-weight: bold;
 }
