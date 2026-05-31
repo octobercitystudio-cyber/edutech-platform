@@ -20,28 +20,37 @@
 
 /* Sidebar Overrides for Clean Branded Theme */
 .student-theme-branded aside {
-  background-color: var(--primary-color) !important; /* Deep Blue */
+  background: linear-gradient(180deg, var(--primary-color) 0%, #0a3a66 70%, rgba(255, 183, 3, 0.1) 100%) !important;
   border-left: none !important;
   color: #ffffff;
+  box-shadow: -4px 0 20px rgba(15, 76, 129, 0.15);
 }
 
 .student-theme-branded aside h3.profileTitle {
   color: #ffffff !important;
+  font-weight: 800;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .student-theme-branded aside ul li {
-  color: rgba(255, 255, 255, 0.7) !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+  transition: all 0.3s ease;
+  border-radius: 0 12px 12px 0;
+  margin-left: 15px;
 }
 
 .student-theme-branded aside ul li.active {
-  background: rgba(255, 183, 3, 0.15) !important;
+  background: linear-gradient(90deg, rgba(255, 183, 3, 0.2) 0%, rgba(255, 183, 3, 0.05) 100%) !important;
   color: var(--secondary-color) !important;
   border-right: 4px solid var(--secondary-color) !important;
+  font-weight: bold;
+  box-shadow: inset -3px 0 10px rgba(255, 183, 3, 0.1);
 }
 
 .student-theme-branded aside ul li:hover:not(.active) {
-  background-color: rgba(255, 255, 255, 0.05) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
   color: #ffffff !important;
+  transform: translateX(-5px);
 }
 
 /* Header Overrides */
