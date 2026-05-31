@@ -18,7 +18,9 @@ export default function StudentSidebar() {
   return (
     <aside style={styles.sidebar}>
       <div style={styles.logoContainer}>
-        <h2 style={styles.logoText}>علمني</h2>
+        <Link to="/" style={{textDecoration: 'none'}}>
+          <h2 style={styles.logoText}>علمني</h2>
+        </Link>
       </div>
       <div style={styles.profileSection}>
         <h3 style={styles.profileTitle}>الصفحة الشخصية</h3>

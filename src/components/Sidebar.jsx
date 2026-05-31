@@ -58,7 +58,9 @@ export default function Sidebar() {
   return (
     <aside style={styles.sidebar}>
       <div style={styles.logoContainer}>
-        <h2 style={styles.logoText}>علمني</h2>
+        <Link to="/" style={{textDecoration: 'none'}}>
+          <h2 style={styles.logoText}>علمني</h2>
+        </Link>
       </div>
       <nav style={styles.nav}>
         {menuItems.map((item) => {
