@@ -5,6 +5,7 @@ import { MdLock } from 'react-icons/md';
 
 export default function SuperAdminLayout() {
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -18,12 +19,15 @@ export default function SuperAdminLayout() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // كلمة المرور الافتراضية للوحة العليا (يمكن تغييرها لاحقاً)
-    if (password === 'october2026' || password === '123456') {
+    // بيانات الدخول الافتراضية (يمكن تغييرها)
+    const VALID_USERNAME = 'admin';
+    const VALID_PASSWORD = '123';
+
+    if (username === VALID_USERNAME && password === VALID_PASSWORD) {
       sessionStorage.setItem('superAdminAuth', 'true');
       setIsAuthorized(true);
     } else {
-      setError('كلمة المرور غير صحيحة');
+      setError('اسم المستخدم أو كلمة المرور غير صحيحة');
     }
   };
 
@@ -34,10 +38,21 @@ export default function SuperAdminLayout() {
           <div style={{ width: '80px', height: '80px', backgroundColor: '#ef4444', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px auto' }}>
             <MdLock size={40} color="#fff" />
           </div>
-          <h2 style={{ color: '#f8fafc', marginBottom: '10px', marginTop: 0 }}>منطقة محظورة</h2>
-          <p style={{ color: '#94a3b8', marginBottom: '30px' }}>يرجى إدخال كلمة المرور للوصول إلى لوحة التحكم العليا</p>
+          <h2 style={{ color: '#f8fafc', marginBottom: '10px', marginTop: 0 }}>إدارة النظام</h2>
+          <p style={{ color: '#94a3b8', marginBottom: '30px' }}>يرجى تسجيل الدخول بصلاحيات المدير العام</p>
           
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <input 
+              type="text" 
+              placeholder="اسم المستخدم" 
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+                setError('');
+              }}
+              style={{ padding: '15px', borderRadius: '8px', border: '1px solid #334155', backgroundColor: '#0f172a', color: '#fff', textAlign: 'center', fontSize: '1.2rem' }}
+              autoFocus
+            />
             <input 
               type="password" 
               placeholder="كلمة المرور" 
@@ -47,7 +62,6 @@ export default function SuperAdminLayout() {
                 setError('');
               }}
               style={{ padding: '15px', borderRadius: '8px', border: '1px solid #334155', backgroundColor: '#0f172a', color: '#fff', textAlign: 'center', fontSize: '1.2rem' }}
-              autoFocus
             />
             {error && <div style={{ color: '#ef4444', fontSize: '0.9rem' }}>{error}</div>}
             
