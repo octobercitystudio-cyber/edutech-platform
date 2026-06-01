@@ -1,21 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 import PublicNavbar from '../components/PublicNavbar';
 import CourseCard from '../components/CourseCard';
 
 export default function CoursesList() {
   const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/courses')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setCourses(data.data);
-        }
-      })
-      .catch(err => console.error(err));
+    fetchCourses();
   }, []);
+
+  const fetchCourses = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('status', 'نشط')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      if (data) {
+        // Map data to match CourseCard expectations
+        const mappedCourses = data.map(course => ({
+          id: course.id,
+          title: course.title,
+          teacher: course.instructor_name || 'معلم غير محدد',
+          price: course.price,
+          description: course.description,
+          // Fallback image since image_url is missing from db
+          image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&q=80'
+        }));
+        setCourses(mappedCourses);
+      }
+    } catch (err) {
+      console.error('Error fetching courses:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -24,11 +49,21 @@ export default function CoursesList() {
         <h1 style={{color: 'var(--primary-color)'}}>متجر الكورسات</h1>
         <p className="text-muted">تصفح أحدث الكورسات واشترك الآن لتبدأ التعلم</p>
 
-        <div style={styles.grid}>
-          {courses.map(course => (
-            <CourseCard key={course.id} course={course} />
-          ))}
-        </div>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '50px', fontSize: '1.2rem', color: 'var(--text-muted)' }}>
+            جاري تحميل الكورسات...
+          </div>
+        ) : courses.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '50px', fontSize: '1.2rem', color: 'var(--text-muted)' }}>
+            لا توجد كورسات متاحة حالياً
+          </div>
+        ) : (
+          <div style={styles.grid}>
+            {courses.map(course => (
+              <CourseCard key={course.id} course={course} />
+            ))}
+          </div>
+        )}
       </div>
     </>
   );
