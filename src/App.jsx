@@ -32,6 +32,10 @@ import Settings from './pages/Settings';
 
 import AdminSettings from './pages/AdminSettings';
 
+import SuperAdminLayout from './components/SuperAdminLayout';
+import SuperAdminDashboard from './pages/SuperAdminDashboard';
+import SuperAdminSettings from './pages/SuperAdminSettings';
+
 function RoleDashboard() {
   const role = localStorage.getItem('userRole') || 'student';
   if (role === 'admin') return <AdminDashboard />;
@@ -140,6 +144,13 @@ function App() {
         <Route path="/reports" element={<StudentReports />} />
         <Route path="/support" element={<Support />} />
         <Route path="/settings" element={<RoleSettings />} />
+      </Route>
+      
+      {/* Super Admin Routes */}
+      <Route path="/super-admin" element={<SuperAdminLayout />}>
+        <Route index element={<SuperAdminDashboard />} />
+        <Route path="settings" element={<SuperAdminSettings />} />
+        <Route path="*" element={<div style={{padding: '50px', textAlign: 'center'}}>صفحة غير موجودة في إدارة النظام</div>} />
       </Route>
       
       <Route path="*" element={<div style={{padding: '50px', textAlign: 'center'}}>صفحة غير موجودة</div>} />
