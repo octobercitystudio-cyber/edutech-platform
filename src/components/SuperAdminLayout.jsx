@@ -19,9 +19,9 @@ export default function SuperAdminLayout() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // بيانات الدخول الافتراضية (يمكن تغييرها)
-    const VALID_USERNAME = 'admin';
-    const VALID_PASSWORD = '123';
+    // جلب بيانات الدخول المحفوظة أو استخدام الافتراضية
+    const VALID_USERNAME = localStorage.getItem('superAdminUser') || 'admin';
+    const VALID_PASSWORD = localStorage.getItem('superAdminPass') || '123';
 
     if (username === VALID_USERNAME && password === VALID_PASSWORD) {
       sessionStorage.setItem('superAdminAuth', 'true');
