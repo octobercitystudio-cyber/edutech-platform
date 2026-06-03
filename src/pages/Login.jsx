@@ -96,17 +96,6 @@ export default function Login() {
             <button type="submit" className="btn btn-primary" style={{width: '100%', padding: '15px', fontSize: '1.2rem', marginTop: 'var(--space-4)'}}>
               تسجيل الدخول
             </button>
-            
-            <div style={{marginTop: '20px', padding: '15px', backgroundColor: 'var(--bg-light)', borderRadius: 'var(--radius-md)'}}>
-              <p style={{margin: '0 0 10px 0', fontSize: '0.9rem', color: 'var(--text-muted)', textAlign: 'center'}}>دخول سريع للتجربة (بدون حساب)</p>
-              <div style={{display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap'}}>
-                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => bypassLogin('student')}>حساب طالب</button>
-                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => bypassLogin('parent')}>حساب ولي أمر</button>
-                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => bypassLogin('teacher')}>حساب معلم</button>
-                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => bypassLogin('assistant')}>حساب مساعد</button>
-                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => bypassLogin('admin')}>حساب مدير</button>
-              </div>
-            </div>
           </form>
 
           <div style={{textAlign: 'center', marginTop: 'var(--space-6)'}}>

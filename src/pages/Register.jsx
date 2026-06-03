@@ -172,27 +172,6 @@ export default function Register() {
             <button type="submit" className="btn btn-primary" style={{width: '100%', padding: '15px', fontSize: '1.2rem', marginTop: 'var(--space-4)'}}>
               إنشاء حساب
             </button>
-            
-            <div style={{marginTop: '20px', padding: '15px', backgroundColor: 'var(--bg-light)', borderRadius: 'var(--radius-md)'}}>
-              <p style={{margin: '0 0 10px 0', fontSize: '0.9rem', color: 'var(--text-muted)', textAlign: 'center'}}>دخول سريع للتجربة (بدون حساب)</p>
-              <div style={{display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap'}}>
-                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => {
-                  localStorage.setItem('userRole', 'student'); navigate('/dashboard'); window.location.reload();
-                }}>حساب طالب</button>
-                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => {
-                  localStorage.setItem('userRole', 'parent'); navigate('/dashboard'); window.location.reload();
-                }}>حساب ولي أمر</button>
-                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => {
-                  localStorage.setItem('userRole', 'teacher'); navigate('/dashboard'); window.location.reload();
-                }}>حساب معلم</button>
-                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => {
-                  localStorage.setItem('userRole', 'assistant'); navigate('/dashboard'); window.location.reload();
-                }}>حساب مساعد</button>
-                <button type="button" className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem'}} onClick={() => {
-                  localStorage.setItem('userRole', 'admin'); navigate('/dashboard'); window.location.reload();
-                }}>حساب مدير</button>
-              </div>
-            </div>
           </form>
 
           <div style={{textAlign: 'center', marginTop: 'var(--space-6)'}}>
