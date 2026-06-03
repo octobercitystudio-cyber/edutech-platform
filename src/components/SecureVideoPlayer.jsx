@@ -156,6 +156,7 @@ export default function SecureVideoPlayer({ videoSrc }) {
           playing={playing}
           volume={volume}
           muted={muted}
+          light={true}
           onProgress={handleProgress}
           onDuration={handleDuration}
           onError={(e) => {
@@ -181,13 +182,6 @@ export default function SecureVideoPlayer({ videoSrc }) {
             }
           }}
         />
-
-        {/* Debug Info (To be removed later) */}
-        <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.8)', color: 'lime', padding: '10px', zIndex: 100, fontSize: '12px', direction: 'ltr', textAlign: 'left', maxWidth: '300px', wordWrap: 'break-word' }}>
-          URL: {videoSrc || 'Fallback'}<br/>
-          Playing: {playing ? 'true' : 'false'}<br/>
-          Ready: {duration > 0 ? 'yes' : 'no'}
-        </div>
 
         {/* الدرع الشفاف (Click Shield) لمنع أي تفاعل مباشر مع إطار يوتيوب */}
         <div 
