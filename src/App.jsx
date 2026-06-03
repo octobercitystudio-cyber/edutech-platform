@@ -61,31 +61,7 @@ function StudentLayout() {
       <div className="main-content">
         <Header />
         
-        {/* Floating Wallet Button */}
-        {role === 'student' && (
-          <div style={{
-            position: 'fixed',
-            top: '20px',
-            right: '20px',
-            backgroundColor: '#33354b',
-            color: '#ef4444',
-            width: '70px',
-            height: '70px',
-            borderRadius: '50%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 1000,
-            boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
-            fontSize: '0.8rem',
-            fontWeight: 'bold',
-            cursor: 'pointer'
-          }}>
-            <span style={{fontSize: '1.2rem', marginBottom: '2px'}}>👛</span>
-            0 جنيه
-          </div>
-        )}
+        {/* Floating Wallet Button Removed */}
 
         <main className="page-content">
           <Outlet />
