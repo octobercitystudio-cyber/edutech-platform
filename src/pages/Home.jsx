@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MdSchool, MdGroups, MdOndemandVideo, MdCheckCircle, MdFormatQuote, MdStar } from 'react-icons/md';
+import { supabase } from '../supabaseClient';
 
 import PublicNavbar from '../components/PublicNavbar';
 import CourseCard from '../components/CourseCard';
@@ -10,14 +11,34 @@ export default function Home() {
   const [featuredCourses, setFeaturedCourses] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/courses')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setFeaturedCourses(data.data.slice(0, 3));
+    const fetchFeaturedCourses = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('courses')
+          .select('*')
+          .eq('status', 'نشط')
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        if (error) throw error;
+
+        if (data) {
+          const mappedCourses = data.map(course => ({
+            id: course.id,
+            title: course.title,
+            teacher: course.instructor_name || 'معلم غير محدد',
+            price: course.price,
+            description: course.description,
+            image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&q=80'
+          }));
+          setFeaturedCourses(mappedCourses);
         }
-      })
-      .catch(err => console.error(err));
+      } catch (err) {
+        console.error('Error fetching featured courses:', err);
+      }
+    };
+
+    fetchFeaturedCourses();
   }, []);
 
   return (
