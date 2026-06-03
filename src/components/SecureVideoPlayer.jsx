@@ -158,18 +158,24 @@ export default function SecureVideoPlayer({ videoSrc }) {
           muted={muted}
           onProgress={handleProgress}
           onDuration={handleDuration}
+          onError={(e) => {
+            console.error('Video Error:', e);
+            alert('تعذر تشغيل الفيديو! إذا كان رابط يوتيوب، تأكد من تفعيل خاصية "السماح بالتضمين" (Allow Embedding) في إعدادات الفيديو على يوتيوب، وتأكد أن الرابط صحيح.');
+          }}
+          onReady={() => console.log('Player is ready!')}
           width="100%"
           height="100%"
           style={{ position: 'absolute', top: 0, left: 0 }}
           config={{
             youtube: {
               playerVars: { 
-                controls: 0,          // إخفاء تحكم يوتيوب بالكامل
+                controls: 0,
                 modestbranding: 1, 
                 rel: 0, 
                 showinfo: 0,
-                disablekb: 1,         // إيقاف اختصارات الكيبورد ليوتيوب
-                iv_load_policy: 3     // إخفاء التعليقات التوضيحية
+                disablekb: 1,
+                iv_load_policy: 3,
+                origin: window.location.origin
               }
             }
           }}
