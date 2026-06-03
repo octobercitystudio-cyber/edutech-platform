@@ -2,14 +2,22 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { MdPayment, MdOutlineCreditCard, MdAccountBalanceWallet } from 'react-icons/md';
 
+import { supabase } from '../supabaseClient';
+
 export default function Checkout() {
   const [selectedMethod, setSelectedMethod] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // جلب تفاصيل الكورس من state إذا وجدت
-  const courseDetails = location.state || { courseId: 1, title: 'الفيزياء الشاملة للثانوية العامة', price: 250 };
+  const courseDetails = location.state;
+
+  // Redirect back if no course details
+  React.useEffect(() => {
+    if (!courseDetails) {
+      navigate('/courses');
+    }
+  }, [courseDetails, navigate]);
 
   const handlePayment = async (e) => {
     e.preventDefault();
@@ -18,35 +26,93 @@ export default function Checkout() {
       return;
     }
 
+    if (selectedMethod !== 'wallet') {
+      alert('وسيلة الدفع هذه غير مفعلة حالياً. الرجاء استخدام المحفظة.');
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
-      const response = await fetch('http://localhost:3000/api/payment/checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          courseId: courseDetails.courseId,
-          method: selectedMethod
-        })
-      });
-
-      const data = await response.json();
-      setIsProcessing(false);
-
-      if (data.success) {
-        alert(data.message);
-        navigate('/my-courses');
-      } else {
-        alert('حدث خطأ: ' + data.message);
+      // 1. Get current user
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData?.user) {
+        throw new Error('يجب تسجيل الدخول لإتمام الشراء');
       }
+      const userId = userData.user.id;
+
+      // 2. Check if already enrolled
+      const { data: existingEnrollment } = await supabase
+        .from('enrollments')
+        .select('*')
+        .eq('student_id', userId)
+        .eq('course_id', courseDetails.courseId)
+        .single();
+
+      if (existingEnrollment) {
+        alert('أنت مشترك بالفعل في هذا الكورس!');
+        navigate('/my-courses');
+        return;
+      }
+
+      // 3. Get wallet balance
+      const { data: walletData, error: walletError } = await supabase
+        .from('wallet')
+        .select('*')
+        .eq('student_id', userId)
+        .single();
+
+      if (walletError && walletError.code !== 'PGRST116') {
+        throw new Error('خطأ في استرجاع بيانات المحفظة');
+      }
+
+      const balance = walletData ? walletData.balance : 0;
+      const price = courseDetails.price || 0;
+
+      if (balance < price) {
+        throw new Error('رصيد المحفظة غير كافٍ لإتمام عملية الشراء');
+      }
+
+      // 4. Deduct balance
+      const newBalance = balance - price;
+      
+      // If wallet doesn't exist, we can't deduct (though it should exist per trigger)
+      if (walletData) {
+        const { error: updateError } = await supabase
+          .from('wallet')
+          .update({ balance: newBalance })
+          .eq('student_id', userId);
+          
+        if (updateError) throw updateError;
+      } else {
+        throw new Error('محفظتك غير مفعلة');
+      }
+
+      // 5. Insert enrollment
+      const { error: enrollError } = await supabase
+        .from('enrollments')
+        .insert([{
+          student_id: userId,
+          course_id: courseDetails.courseId,
+          progress: 0
+        }]);
+
+      if (enrollError) throw enrollError;
+
+      alert('تم شراء الكورس بنجاح!');
+      navigate('/my-courses');
+
     } catch (error) {
       console.error(error);
+      alert(error.message || 'فشلت عملية الدفع');
+    } finally {
       setIsProcessing(false);
-      alert('فشل الاتصال بالخادم، يرجى التأكد من تشغيل السيرفر.');
     }
   };
+
+
+
+  if (!courseDetails) return null;
 
   return (
     <div style={styles.container}>

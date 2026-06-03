@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { MdPlayCircleOutline, MdOutlineFileDownload, MdOutlineCheckCircle } from 'react-icons/md';
 import PublicNavbar from '../components/PublicNavbar';
+import { supabase } from '../supabaseClient';
 
 export default function SingleCourse() {
   const { id } = useParams();
@@ -10,20 +11,25 @@ export default function SingleCourse() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/api/courses/${id}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setCourse(data.data);
-        } else {
-          setCourse(null);
-        }
+    const fetchCourse = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('courses')
+          .select('*')
+          .eq('id', id)
+          .single();
+          
+        if (error) throw error;
+        setCourse(data);
+      } catch (err) {
+        console.error('Error fetching course:', err);
+        setCourse(null);
+      } finally {
         setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+      }
+    };
+    
+    fetchCourse();
   }, [id]);
 
   if (loading) {
@@ -61,8 +67,8 @@ export default function SingleCourse() {
         <div>
           <h1 style={{color: 'var(--primary-color)'}}>{course.title}</h1>
           <p className="text-muted" style={{fontSize: '1.2rem'}}>
-            <Link to={`/instructor/${encodeURIComponent(course.teacher)}`} style={{color: 'inherit', textDecoration: 'none'}}>
-              {course.teacher}
+            <Link to={`/instructor/${encodeURIComponent(course.instructor_name || '')}`} style={{color: 'inherit', textDecoration: 'none'}}>
+              {course.instructor_name || 'معلم غير محدد'}
             </Link> - كورس كامل
           </p>
         </div>
@@ -73,8 +79,7 @@ export default function SingleCourse() {
           <div className="card" style={{padding: 'var(--space-6)', marginBottom: 'var(--space-6)'}}>
             <h2>عن هذا الكورس</h2>
             <p>
-              كورس متكامل بأسلوب مبسط يعتمد على الفهم والتطبيق.
-              يحتوي الكورس على شرح نظري، حل مسائل، وامتحانات دورية لتقييم مستواك.
+              {course.description || 'لا يوجد وصف متاح لهذا الكورس حالياً.'}
             </p>
             
             <h3 style={{marginTop: 'var(--space-6)'}}>ماذا ستتعلم؟</h3>
@@ -88,16 +93,8 @@ export default function SingleCourse() {
           <div className="card" style={{padding: 'var(--space-6)'}}>
             <h2>محتوى الكورس</h2>
             <div style={styles.lesson}>
-              <div style={styles.lessonTitle}><MdPlayCircleOutline /> الدرس الأول: المفاهيم الأساسية</div>
-              <span className="text-muted">15:30 دقيقة</span>
-            </div>
-            <div style={styles.lesson}>
-              <div style={styles.lessonTitle}><MdPlayCircleOutline /> الدرس الثاني: تطبيقات وتدريبات</div>
-              <span className="text-muted">45:10 دقيقة</span>
-            </div>
-            <div style={styles.lesson}>
-              <div style={styles.lessonTitle}><MdOutlineFileDownload /> ملزمة وملخص الكورس (PDF)</div>
-              <span className="text-muted">2 MB</span>
+              <div style={styles.lessonTitle}><MdPlayCircleOutline /> سيتم إضافة محتوى الدروس قريباً</div>
+              <span className="text-muted">--:--</span>
             </div>
           </div>
         </div>
@@ -105,24 +102,25 @@ export default function SingleCourse() {
         <div style={styles.sideCol}>
           <div className="card" style={{padding: 'var(--space-4)'}}>
             <img 
-              src={course.image} 
+              src={course.image_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&q=80'} 
               alt={course.title} 
               style={{width: '100%', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-4)'}} 
             />
             <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-2)'}}>
-              <span className="text-muted">عدد الدروس:</span>
-              <strong>{course.lessons} درس</strong>
+              <span className="text-muted">النوع:</span>
+              <strong>{course.type || 'اونلاين'}</strong>
             </div>
             <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-4)'}}>
-              <span className="text-muted">إجمالي الساعات:</span>
-              <strong>{course.duration}</strong>
+              <span className="text-muted">تاريخ النشر:</span>
+              <strong>{new Date(course.created_at).toLocaleDateString('ar-EG')}</strong>
             </div>
             <h3 style={{textAlign: 'center', color: 'var(--secondary-hover)'}}>{course.price} ج.م</h3>
             <button 
               className="btn btn-primary" 
               style={{width: '100%', marginBottom: 'var(--space-2)'}} 
-              onClick={() => {
-                if (!localStorage.getItem('userId')) {
+              onClick={async () => {
+                const { data } = await supabase.auth.getUser();
+                if (!data?.user) {
                   navigate('/login', { state: { from: `/courses/${id}` } });
                 } else {
                   navigate('/checkout', { state: { courseId: course.id, price: course.price, title: course.title } });
