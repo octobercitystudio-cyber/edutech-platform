@@ -1,16 +1,81 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { MdPeople, MdMenuBook, MdAttachMoney, MdQuestionAnswer, MdAddCircle, MdAssignment } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
 export default function TeacherDashboard() {
   const navigate = useNavigate();
   const userName = localStorage.getItem('userName') || 'معلم';
+  
+  const [stats, setStats] = useState({
+    students: 0,
+    courses: 0,
+    revenue: 0,
+    questions: 0
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTeacherStats();
+  }, [userName]);
+
+  const fetchTeacherStats = async () => {
+    try {
+      setLoading(true);
+      
+      // 1. Fetch Teacher's Courses
+      const { data: myCourses } = await supabase
+        .from('courses')
+        .select('id, price')
+        .eq('instructor_name', userName);
+        
+      if (!myCourses || myCourses.length === 0) {
+        setStats(s => ({ ...s, courses: 0 }));
+        setLoading(false);
+        return;
+      }
+      
+      const courseIds = myCourses.map(c => c.id);
+      
+      // 2. Fetch Enrollments for these courses
+      const { data: enrollments } = await supabase
+        .from('enrollments')
+        .select('student_id, course_id')
+        .in('course_id', courseIds);
+        
+      let uniqueStudents = new Set();
+      let totalRevenue = 0;
+      
+      if (enrollments) {
+        enrollments.forEach(en => {
+          uniqueStudents.add(en.student_id);
+          // find course price
+          const course = myCourses.find(c => c.id === en.course_id);
+          if (course && course.price) {
+            totalRevenue += parseFloat(course.price);
+          }
+        });
+      }
+
+      setStats({
+        students: uniqueStudents.size,
+        courses: myCourses.length,
+        revenue: totalRevenue,
+        questions: 0 // Mock pending questions
+      });
+
+    } catch (error) {
+      console.error('Error fetching teacher stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const statCards = [
-    { title: 'إجمالي الطلاب', value: '0', icon: <MdPeople />, color: '#0f4c81' },
-    { title: 'الكورسات النشطة', value: '0', icon: <MdMenuBook />, color: '#10b981' },
-    { title: 'أرباح الشهر', value: '0 ج.م', icon: <MdAttachMoney />, color: '#ffb703' },
-    { title: 'أسئلة معلقة', value: '0', icon: <MdQuestionAnswer />, color: '#e74c3c' },
+    { title: 'إجمالي الطلاب', value: stats.students, icon: <MdPeople />, color: '#0f4c81' },
+    { title: 'الكورسات النشطة', value: stats.courses, icon: <MdMenuBook />, color: '#10b981' },
+    { title: 'إجمالي الأرباح', value: `${stats.revenue} ج.م`, icon: <MdAttachMoney />, color: '#ffb703' },
+    { title: 'أسئلة معلقة', value: stats.questions, icon: <MdQuestionAnswer />, color: '#e74c3c' },
   ];
 
   return (
