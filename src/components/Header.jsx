@@ -21,10 +21,12 @@ export default function Header() {
         <h3 style={{margin: 0, color: 'var(--primary-color)'}}>أهلاً بك، {userName} 👋</h3>
       </div>
       <div style={styles.actions}>
-        <div style={styles.wallet}>
-          <MdAccountBalanceWallet style={styles.walletIcon} />
-          <span>الرصيد: 1500 ج.م</span>
-        </div>
+        {userRole === 'student' && (
+          <div style={styles.wallet}>
+            <MdAccountBalanceWallet style={styles.walletIcon} />
+            <span>محفظتي</span>
+          </div>
+        )}
         
         <div style={{position: 'relative'}}>
           <button 
@@ -43,12 +45,8 @@ export default function Header() {
               </div>
               <ul style={{listStyle: 'none', padding: 0, margin: 0, maxHeight: '300px', overflowY: 'auto'}}>
                 <li style={{padding: '15px', borderBottom: '1px solid var(--border-color)', backgroundColor: 'rgba(15,76,129,0.05)'}}>
-                  <div style={{fontWeight: 'bold', fontSize: '0.9rem', color: 'var(--primary-color)'}}>تذكير بامتحان الفيزياء</div>
-                  <div style={{fontSize: '0.8rem', color: 'var(--text-muted)'}}>امتحان الباب الأول يبدأ غداً الساعة 8 مساءً. يرجى الاستعداد.</div>
-                </li>
-                <li style={{padding: '15px', borderBottom: '1px solid var(--border-color)'}}>
-                  <div style={{fontWeight: 'bold', fontSize: '0.9rem', color: 'var(--text-main)'}}>تم تصحيح واجب الكيمياء</div>
-                  <div style={{fontSize: '0.8rem', color: 'var(--text-muted)'}}>لقد حصلت على درجة 18/20. اضغط هنا لرؤية التفاصيل.</div>
+                  <div style={{fontWeight: 'bold', fontSize: '0.9rem', color: 'var(--primary-color)'}}>مرحباً بك في المنصة</div>
+                  <div style={{fontSize: '0.8rem', color: 'var(--text-muted)'}}>نتمنى لك تجربة تعليمية ممتعة.</div>
                 </li>
               </ul>
               <div style={{padding: '10px', textAlign: 'center', backgroundColor: 'var(--bg-light)', color: 'var(--primary-color)', cursor: 'pointer', fontSize: '0.9rem'}}>
@@ -74,8 +72,13 @@ export default function Header() {
                   <MdPerson size={24} />
                 </div>
                 <div>
-                  <div style={{fontWeight: 'bold'}}>أحمد طالب</div>
-                  <div style={{fontSize: '0.8rem', color: 'var(--text-muted)'}}>الصف الثالث الثانوي</div>
+                  <div style={{fontWeight: 'bold'}}>{userName}</div>
+                  <div style={{fontSize: '0.8rem', color: 'var(--text-muted)'}}>
+                    {userRole === 'admin' ? 'مدير النظام' : 
+                     userRole === 'teacher' ? 'معلم' : 
+                     userRole === 'assistant' ? 'مساعد' : 
+                     userRole === 'parent' ? 'ولي أمر' : 'طالب'}
+                  </div>
                 </div>
               </div>
               <ul style={{listStyle: 'none', padding: 0, margin: 0}}>
