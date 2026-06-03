@@ -8,10 +8,31 @@ export default function MyCourses() {
   const [activeTab, setActiveTab] = useState('summary');
   const [myCourses, setMyCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [courseLessons, setCourseLessons] = useState([]);
+  const [loadingLessons, setLoadingLessons] = useState(false);
 
   useEffect(() => {
     fetchMyCourses();
   }, []);
+
+  useEffect(() => {
+    if (selectedCourse) {
+      fetchLessons(selectedCourse.courseId);
+    }
+  }, [selectedCourse]);
+
+  const fetchLessons = async (courseId) => {
+    setLoadingLessons(true);
+    try {
+      const { data, error } = await supabase.from('lessons').select('*').eq('course_id', courseId).order('order_index', { ascending: true });
+      if (error) throw error;
+      setCourseLessons(data || []);
+    } catch (err) {
+      console.error('Error fetching lessons:', err);
+    } finally {
+      setLoadingLessons(false);
+    }
+  };
 
   const fetchMyCourses = async () => {
     try {
@@ -66,6 +87,46 @@ export default function MyCourses() {
 
   const renderTabContent = () => {
     switch(activeTab) {
+      case 'lessons':
+        return (
+          <div className="fade-in" style={{marginTop: '30px'}}>
+            <div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: '20px'}}>
+              <h3 className="text-primary">محتوى الفصل (الدروس)</h3>
+            </div>
+            {loadingLessons ? (
+              <div style={{textAlign: 'center', padding: '30px', color: 'var(--text-muted)'}}>جاري تحميل الدروس...</div>
+            ) : courseLessons.length === 0 ? (
+              <div style={{textAlign: 'center', padding: '40px', backgroundColor: '#f8fafc', borderRadius: '10px', color: 'var(--text-muted)'}}>
+                <MdPlayCircleFilled size={50} color="#cbd5e1" style={{marginBottom: '10px'}} />
+                <p>لم يتم إضافة دروس لهذا الكورس بعد.</p>
+              </div>
+            ) : (
+              <div style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
+                {courseLessons.map((lesson, idx) => (
+                  <div key={lesson.id} className="branded-card" style={{padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '15px'}}>
+                      <div style={{width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(15, 76, 129, 0.1)', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'var(--primary-color)', fontWeight: 'bold'}}>
+                        {idx + 1}
+                      </div>
+                      <div>
+                        <h4 style={{margin: 0, fontSize: '1.1rem', color: 'var(--text-main)'}}>{lesson.title}</h4>
+                        <div style={{fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '5px'}}>المدة: {lesson.duration_minutes} دقيقة</div>
+                      </div>
+                    </div>
+                    <button 
+                      className="btn btn-primary" 
+                      style={{padding: '8px 20px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '5px'}}
+                      onClick={() => window.location.href = `/lesson/${selectedCourse.courseId}?lessonId=${lesson.id}`}
+                    >
+                      <MdPlayCircleFilled size={20} /> شاهد الآن
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+
       case 'webinars':
         return (
           <div className="fade-in" style={{marginTop: '30px'}}>
@@ -303,12 +364,11 @@ export default function MyCourses() {
                 {selectedCourse.title} ⬅️
               </span>
               <div style={{display: 'flex', gap: '10px'}}>
-                <span style={styles.tabItem}>الملاحظات</span>
-                <span style={styles.tabItem}>الاسئلة</span>
+                <span style={activeTab === 'lessons' ? styles.activeTabItem : styles.tabItem} onClick={() => setActiveTab('lessons')}>الدروس</span>
+                <span style={activeTab === 'summary' ? styles.activeTabItem : styles.tabItem} onClick={() => setActiveTab('summary')}>ملخص الفصل</span>
                 <span style={activeTab === 'webinars' ? styles.activeTabItem : styles.tabItem} onClick={() => setActiveTab('webinars')}>الندوات</span>
                 <span style={activeTab === 'exams' ? styles.activeTabItem : styles.tabItem} onClick={() => setActiveTab('exams')}>الامتحانات</span>
                 <span style={activeTab === 'attendance' ? styles.activeTabItem : styles.tabItem} onClick={() => setActiveTab('attendance')}>الحضور</span>
-                <span style={activeTab === 'summary' ? styles.activeTabItem : styles.tabItem} onClick={() => setActiveTab('summary')}>ملخص الفصل</span>
               </div>
             </div>
 
