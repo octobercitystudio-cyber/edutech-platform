@@ -69,9 +69,15 @@ export default function Sidebar() {
             <Link 
               key={item.path} 
               to={item.path} 
-              className={`sidebar-link ${isActive ? 'active' : ''}`}
+              style={{...styles.link, ...(isActive ? styles.activeLink : {})}}
+              onMouseEnter={(e) => {
+                if (!isActive) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
-              <span className="sidebar-icon">{item.icon}</span>
+              <span className="sidebar-icon" style={styles.icon}>{item.icon}</span>
               {item.name}
             </Link>
           );
@@ -84,17 +90,18 @@ export default function Sidebar() {
 const styles = {
   sidebar: {
     width: '260px',
-    backgroundColor: 'var(--surface-color)',
-    borderLeft: '1px solid var(--border-color)',
+    backgroundColor: 'var(--primary-color)',
+    borderLeft: 'none',
     display: 'flex',
     flexDirection: 'column',
     height: '100vh',
     position: 'sticky',
     top: 0,
+    boxShadow: '2px 0 10px rgba(0,0,0,0.1)'
   },
   logoContainer: {
     padding: 'var(--space-6)',
-    borderBottom: '1px solid var(--border-color)',
+    borderBottom: '1px solid rgba(255,255,255,0.1)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -102,7 +109,7 @@ const styles = {
   logoText: {
     color: '#ffffff',
     margin: 0,
-    fontSize: '1.8rem',
+    fontSize: '2rem',
     fontWeight: 'bold',
     letterSpacing: '1px'
   },
@@ -116,15 +123,15 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     padding: 'var(--space-4) var(--space-6)',
-    color: 'var(--text-muted)',
+    color: '#ffffff',
     fontSize: '1.1rem',
-    fontWeight: 600,
+    fontWeight: 'bold',
     transition: 'all 0.2s',
   },
   activeLink: {
     color: 'var(--primary-color)',
-    backgroundColor: 'rgba(15, 76, 129, 0.05)',
-    borderRight: '4px solid var(--primary-color)',
+    backgroundColor: '#ffffff',
+    borderRight: '4px solid var(--secondary-color)',
   },
   icon: {
     marginLeft: 'var(--space-4)',
