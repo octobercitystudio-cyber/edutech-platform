@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { MdDashboard, MdMenuBook, MdPayment, MdEventNote, MdOndemandVideo } from 'react-icons/md';
+import { MdDashboard, MdMenuBook, MdPayment, MdEventNote, MdOndemandVideo, MdPeople } from 'react-icons/md';
 
 export default function Sidebar() {
   const location = useLocation();
@@ -20,7 +20,13 @@ export default function Sidebar() {
         { name: 'لوحة التحكم', path: '/dashboard', icon: <MdDashboard /> },
         { name: 'كورساتي', path: '/teacher-courses', icon: <MdOndemandVideo /> },
         { name: 'الامتحانات', path: '/teacher-exams', icon: <MdEventNote /> },
-        { name: 'الطلاب', path: '/teacher-students', icon: <MdMenuBook /> },
+        { name: 'الواجبات والتكليفات', path: '/teacher-assignments', icon: <MdMenuBook /> },
+        { name: 'الفصول المباشرة', path: '/teacher-live', icon: <MdOndemandVideo /> },
+        { name: 'الطلاب', path: '/teacher-students', icon: <MdPeople /> },
+        { name: 'الإعلانات', path: '/teacher-announcements', icon: <MdEventNote /> },
+        { name: 'الماليات', path: '/teacher-finances', icon: <MdPayment /> },
+        { name: 'أدوات التسويق', path: '/teacher-marketing', icon: <MdEventNote /> },
+        { name: 'التقارير', path: '/teacher-reports', icon: <MdMenuBook /> },
       ];
     } else if (role === 'assistant') {
       return [

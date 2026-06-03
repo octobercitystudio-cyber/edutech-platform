@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, Outlet } from 'react-router-dom';
-import './student-theme.css'; // This can stay, it won't apply if we remove the class
+import './student-theme.css'; 
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Home from './pages/Home';
@@ -19,6 +19,9 @@ import TeacherDashboard from './pages/TeacherDashboard';
 import TeacherCourses from './pages/TeacherCourses';
 import TeacherExams from './pages/TeacherExams';
 import TeacherStudents from './pages/TeacherStudents';
+import TeacherFinances from './pages/TeacherFinances';
+import TeacherMarketing from './pages/TeacherMarketing';
+import PlaceholderPage from './pages/PlaceholderPage';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminUsers from './pages/AdminUsers';
 import AdminCourses from './pages/AdminCourses';
@@ -60,9 +63,6 @@ function StudentLayout() {
       <Sidebar />
       <div className="main-content">
         <Header />
-        
-        {/* Floating Wallet Button Removed */}
-
         <main className="page-content">
           <Outlet />
         </main>
@@ -117,14 +117,26 @@ function App() {
         <Route path="/exams/:id" element={<TakeExam />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/profile" element={<Profile />} />
+        
+        {/* Common Modules */}
         <Route path="/assignments" element={<Assignments />} />
         <Route path="/live" element={<LiveSessions />} />
         <Route path="/reports" element={<StudentReports />} />
         <Route path="/support" element={<Support />} />
         <Route path="/settings" element={<RoleSettings />} />
+        
+        {/* Teacher Specific Routes */}
         <Route path="/teacher-courses" element={<TeacherCourses />} />
         <Route path="/teacher-exams" element={<TeacherExams />} />
         <Route path="/teacher-students" element={<TeacherStudents />} />
+        <Route path="/teacher-finances" element={<TeacherFinances />} />
+        <Route path="/teacher-marketing" element={<TeacherMarketing />} />
+        
+        {/* Placeholder Routes for pending features */}
+        <Route path="/teacher-assignments" element={<PlaceholderPage title="إدارة الواجبات والتكليفات" />} />
+        <Route path="/teacher-live" element={<PlaceholderPage title="إدارة الفصول المباشرة" />} />
+        <Route path="/teacher-announcements" element={<PlaceholderPage title="إرسال الإعلانات للطلاب" />} />
+        <Route path="/teacher-reports" element={<PlaceholderPage title="التقارير الشاملة" />} />
       </Route>
       
       {/* Super Admin Routes */}
