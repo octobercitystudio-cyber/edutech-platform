@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, Outlet } from 'react-router-dom';
-import './student-theme.css'; // Add this import
+import './student-theme.css'; // This can stay, it won't apply if we remove the class
 import Sidebar from './components/Sidebar';
-import StudentSidebar from './components/StudentSidebar';
 import Header from './components/Header';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
@@ -57,8 +56,8 @@ function RoleSettings() {
 function StudentLayout() {
   const role = localStorage.getItem('userRole') || 'student';
   return (
-    <div className="app-layout student-theme-branded">
-      {role === 'student' ? <StudentSidebar /> : <Sidebar />}
+    <div className="app-layout">
+      <Sidebar />
       <div className="main-content">
         <Header />
         
