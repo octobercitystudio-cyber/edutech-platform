@@ -3,9 +3,9 @@ import { MdQuestionAnswer, MdAssignment, MdWarning } from 'react-icons/md';
 
 export default function AssistantDashboard() {
   const stats = [
-    { title: 'أسئلة تم الرد عليها', value: '145', icon: <MdQuestionAnswer />, color: '#0f4c81' },
-    { title: 'واجبات مصححة', value: '320', icon: <MdAssignment />, color: '#10b981' },
-    { title: 'طلاب متأخرين (غياب)', value: '18', icon: <MdWarning />, color: '#e74c3c' },
+    { title: 'أسئلة تم الرد عليها', value: '0', icon: <MdQuestionAnswer />, color: '#0f4c81' },
+    { title: 'واجبات مصححة', value: '0', icon: <MdAssignment />, color: '#10b981' },
+    { title: 'طلاب متأخرين (غياب)', value: '0', icon: <MdWarning />, color: '#e74c3c' },
   ];
 
   return (
@@ -42,16 +42,8 @@ export default function AssistantDashboard() {
         <div className="card" style={{padding: 'var(--space-6)'}}>
           <h2 style={{margin: '0 0 var(--space-4) 0', color: 'var(--primary-color)'}}>أسئلة تحتاج إلى رد (Q&A)</h2>
           <div style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
-            <div style={{padding: '15px', backgroundColor: 'var(--bg-light)', borderRadius: 'var(--radius-md)'}}>
-              <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                <div style={{fontWeight: 'bold', marginBottom: '5px'}}>سارة كمال - الكيمياء العضوية</div>
-                <span style={{fontSize: '0.8rem', color: 'var(--text-muted)'}}>منذ ساعتين</span>
-              </div>
-              <p style={{margin: 0, fontSize: '0.95rem', color: 'var(--text-main)'}}>هل يمكن شرح تفاعل الاستبدال مرة أخرى؟ لم أفهمه جيداً.</p>
-              <div style={{marginTop: '15px', display: 'flex', gap: '10px'}}>
-                <input type="text" className="form-control" placeholder="اكتب ردك هنا..." style={{flex: 1}} />
-                <button className="btn btn-primary" style={{padding: '10px 20px'}}>إرسال</button>
-              </div>
+            <div style={{textAlign: 'center', padding: '20px', color: 'var(--text-muted)'}}>
+              لا توجد أسئلة جديدة تحتاج إلى رد
             </div>
           </div>
         </div>

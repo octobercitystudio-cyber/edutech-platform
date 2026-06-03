@@ -3,10 +3,10 @@ import { MdCheckCircle, MdMenuBook, MdAccessTime, MdTrendingUp } from 'react-ico
 
 export default function ParentDashboard() {
   const stats = [
-    { title: 'الكورسات المشترك بها', value: '3', icon: <MdMenuBook />, color: '#0f4c81' },
-    { title: 'الامتحانات المنجزة', value: '12', icon: <MdCheckCircle />, color: '#10b981' },
-    { title: 'متوسط الدرجات', value: '85%', icon: <MdTrendingUp />, color: '#ffb703' },
-    { title: 'ساعات المشاهدة', value: '24 ساعة', icon: <MdAccessTime />, color: '#e74c3c' },
+    { title: 'الكورسات المشترك بها', value: '0', icon: <MdMenuBook />, color: '#0f4c81' },
+    { title: 'الامتحانات المنجزة', value: '0', icon: <MdCheckCircle />, color: '#10b981' },
+    { title: 'متوسط الدرجات', value: '0%', icon: <MdTrendingUp />, color: '#ffb703' },
+    { title: 'ساعات المشاهدة', value: '0 ساعة', icon: <MdAccessTime />, color: '#e74c3c' },
   ];
 
   return (
@@ -14,7 +14,7 @@ export default function ParentDashboard() {
       <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-6)'}}>
         <div>
           <h1 style={{color: 'var(--primary-color)', margin: '0 0 10px 0'}}>تقارير ولي الأمر</h1>
-          <p className="text-muted" style={{margin: 0}}>مرحباً، إليك التقرير الشامل لأداء الطالب: <span style={{fontWeight: 'bold', color: 'var(--secondary-color)'}}>أحمد</span></p>
+          <p className="text-muted" style={{margin: 0}}>مرحباً، إليك التقرير الشامل لأداء الطالب</p>
         </div>
       </div>
 
@@ -52,16 +52,9 @@ export default function ParentDashboard() {
           </thead>
           <tbody>
             <tr>
-              <td style={{padding: '15px', borderBottom: '1px solid var(--border-color)'}}>امتحان شامل فيزياء</td>
-              <td style={{padding: '15px', borderBottom: '1px solid var(--border-color)'}}>الفيزياء</td>
-              <td style={{padding: '15px', borderBottom: '1px solid var(--border-color)'}}>45 / 50</td>
-              <td style={{padding: '15px', borderBottom: '1px solid var(--border-color)'}}><span style={{color: '#10b981', fontWeight: 'bold'}}>ممتاز</span></td>
-            </tr>
-            <tr>
-              <td style={{padding: '15px', borderBottom: '1px solid var(--border-color)'}}>كويز الباب الأول</td>
-              <td style={{padding: '15px', borderBottom: '1px solid var(--border-color)'}}>الكيمياء</td>
-              <td style={{padding: '15px', borderBottom: '1px solid var(--border-color)'}}>15 / 20</td>
-              <td style={{padding: '15px', borderBottom: '1px solid var(--border-color)'}}><span style={{color: '#ffb703', fontWeight: 'bold'}}>جيد جداً</span></td>
+              <td colSpan="4" style={{padding: '30px', textAlign: 'center', color: 'var(--text-muted)'}}>
+                لا توجد امتحانات مسجلة حتى الآن
+              </td>
             </tr>
           </tbody>
         </table>

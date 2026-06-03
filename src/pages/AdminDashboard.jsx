@@ -29,7 +29,9 @@ export default function AdminDashboard() {
       }
 
       // Fetch courses
-      const { count: coursesCount } = await supabase.from('courses').select('*', { count: 'exact', head: true });
+      const { data: coursesData } = await supabase.from('courses').select('id');
+      const fakeIds = ['ba2c8232-0717-464f-9ca4-0e7511223b00', '4fd22259-e473-45be-8584-24e6805f5d6f', '5165d69f-5bf1-478a-8c60-644ab131f0f6'];
+      const coursesCount = coursesData ? coursesData.filter(c => !fakeIds.includes(c.id)).length : 0;
 
       // Fetch wallet total (simulated revenue)
       const { data: wallets } = await supabase.from('wallet').select('balance');

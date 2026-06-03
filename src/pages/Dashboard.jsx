@@ -103,7 +103,7 @@ export default function Dashboard() {
           </div>
           <div>
             <div style={styles.statLabel}>الترتيب (Rank)</div>
-            <div style={styles.statValue}>#4</div>
+            <div style={styles.statValue}>-</div>
           </div>
         </div>
 
@@ -113,7 +113,7 @@ export default function Dashboard() {
           </div>
           <div>
             <div style={styles.statLabel}>ساعات التعلم</div>
-            <div style={styles.statValue}>12.5</div>
+            <div style={styles.statValue}>0</div>
           </div>
         </div>
       </div>
@@ -201,26 +201,8 @@ export default function Dashboard() {
             </h2>
             
             <div style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
-              <div style={styles.taskItem}>
-                <div style={styles.taskDate}>
-                  <span style={{fontSize: '1.2rem', fontWeight: 'bold'}}>15</span>
-                  <span style={{fontSize: '0.8rem'}}>أغسطس</span>
-                </div>
-                <div>
-                  <h4 style={{margin: '0 0 5px 0', color: 'var(--text-main)'}}>امتحان الفيزياء - الباب الأول</h4>
-                  <div style={{fontSize: '0.85rem', color: 'var(--text-muted)'}}>الساعة 8:00 مساءً</div>
-                </div>
-              </div>
-
-              <div style={{...styles.taskItem, borderLeftColor: 'var(--primary-color)'}}>
-                <div style={styles.taskDate}>
-                  <span style={{fontSize: '1.2rem', fontWeight: 'bold'}}>18</span>
-                  <span style={{fontSize: '0.8rem'}}>أغسطس</span>
-                </div>
-                <div>
-                  <h4 style={{margin: '0 0 5px 0', color: 'var(--text-main)'}}>بث مباشر: مراجعة الكيمياء</h4>
-                  <div style={{fontSize: '0.85rem', color: 'var(--text-muted)'}}>الساعة 9:00 مساءً</div>
-                </div>
+              <div style={{textAlign: 'center', padding: '20px', color: 'var(--text-muted)'}}>
+                لا توجد مهام قادمة
               </div>
             </div>
             
