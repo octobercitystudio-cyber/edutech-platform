@@ -6,12 +6,17 @@ export default function TeacherCourses() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  
+  // Create / Edit Course State
+  const [editingCourseId, setEditingCourseId] = useState(null);
   const [newCourse, setNewCourse] = useState({
     title: '',
     description: '',
     price: 0,
-    type: 'اونلاين'
+    type: 'اونلاين',
+    image_url: ''
   });
+  
   const [userName, setUserName] = useState('');
 
   // Lesson Management States
@@ -62,38 +67,82 @@ export default function TeacherCourses() {
     }
   };
 
-  const handleAddCourse = async (e) => {
+  const handleSaveCourse = async (e) => {
     e.preventDefault();
     try {
-      const { data, error } = await supabase
-        .from('courses')
-        .insert([
-          {
+      if (editingCourseId) {
+        // Edit existing course
+        const { error } = await supabase
+          .from('courses')
+          .update({
             title: newCourse.title,
             description: newCourse.description,
             price: newCourse.price,
-            instructor_name: userName,
-            status: 'نشط',
-          }
-        ])
-        .select();
+            type: newCourse.type,
+            image_url: newCourse.image_url
+          })
+          .eq('id', editingCourseId);
 
-      if (error) throw error;
-      
-      await supabase.from('courses').update({ status: 'نشط', type: newCourse.type }).eq('id', data[0].id);
-      
-      alert('تم إضافة الكورس بنجاح!');
+        if (error) throw error;
+        alert('تم تعديل الكورس بنجاح!');
+      } else {
+        // Add new course
+        const { data, error } = await supabase
+          .from('courses')
+          .insert([
+            {
+              title: newCourse.title,
+              description: newCourse.description,
+              price: newCourse.price,
+              instructor_name: userName,
+              status: 'نشط',
+              image_url: newCourse.image_url
+            }
+          ])
+          .select();
+
+        if (error) throw error;
+        
+        // update type since it might not be in the initial schema correctly
+        if(data && data.length > 0) {
+          await supabase.from('courses').update({ status: 'نشط', type: newCourse.type }).eq('id', data[0].id);
+        }
+        alert('تم إضافة الكورس بنجاح!');
+      }
+
       setShowModal(false);
-      setNewCourse({ title: '', description: '', price: 0, type: 'اونلاين' });
+      resetCourseForm();
       fetchTeacherCourses();
     } catch (err) {
-      console.error('Error adding course:', err);
-      alert('حدث خطأ أثناء إضافة الكورس');
+      console.error('Error saving course:', err);
+      alert('حدث خطأ أثناء حفظ الكورس');
     }
   };
 
+  const openAddModal = () => {
+    resetCourseForm();
+    setShowModal(true);
+  };
+
+  const openEditModal = (course) => {
+    setEditingCourseId(course.id);
+    setNewCourse({
+      title: course.title || '',
+      description: course.description || '',
+      price: course.price || 0,
+      type: course.type || 'اونلاين',
+      image_url: course.image_url || ''
+    });
+    setShowModal(true);
+  };
+
+  const resetCourseForm = () => {
+    setEditingCourseId(null);
+    setNewCourse({ title: '', description: '', price: 0, type: 'اونلاين', image_url: '' });
+  };
+
   const handleDeleteCourse = async (courseId) => {
-    if(!window.confirm('هل أنت متأكد من حذف هذا الكورس؟')) return;
+    if(!window.confirm('هل أنت متأكد من حذف هذا الكورس وجميع دروسه نهائياً؟')) return;
     try {
       await supabase.from('courses').delete().eq('id', courseId);
       setCourses(courses.filter(c => c.id !== courseId));
@@ -167,7 +216,7 @@ export default function TeacherCourses() {
           <h1 style={{color: 'var(--primary-color)', margin: '0 0 10px 0'}}>إدارة كورساتي</h1>
           <p className="text-muted" style={{margin: 0}}>قم بإضافة وتعديل الكورسات الخاصة بك ومحتواها.</p>
         </div>
-        <button className="btn btn-primary" style={{display: 'flex', alignItems: 'center', gap: '10px'}} onClick={() => setShowModal(true)}>
+        <button className="btn btn-primary" style={{display: 'flex', alignItems: 'center', gap: '10px'}} onClick={openAddModal}>
           <MdAdd size={24} /> إضافة كورس جديد
         </button>
       </div>
@@ -186,6 +235,7 @@ export default function TeacherCourses() {
             <table style={{width: '100%', borderCollapse: 'collapse', textAlign: 'right'}}>
               <thead>
                 <tr style={{borderBottom: '2px solid var(--border-color)', backgroundColor: 'var(--bg-light)'}}>
+                  <th style={{padding: '15px'}}>صورة</th>
                   <th style={{padding: '15px'}}>عنوان الكورس</th>
                   <th style={{padding: '15px'}}>السعر</th>
                   <th style={{padding: '15px'}}>تاريخ الإنشاء</th>
@@ -196,6 +246,15 @@ export default function TeacherCourses() {
               <tbody>
                 {courses.map(course => (
                   <tr key={course.id} style={{borderBottom: '1px solid var(--border-color)'}}>
+                    <td style={{padding: '15px'}}>
+                      <div style={{width: '60px', height: '40px', backgroundColor: '#e2e8f0', borderRadius: '5px', overflow: 'hidden'}}>
+                        {course.image_url ? (
+                          <img src={course.image_url} alt="course" style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+                        ) : (
+                          <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', color: '#94a3b8'}}>بدون صورة</div>
+                        )}
+                      </div>
+                    </td>
                     <td style={{padding: '15px', fontWeight: 'bold', color: 'var(--primary-color)'}}>{course.title}</td>
                     <td style={{padding: '15px'}}>{course.price} ج.م</td>
                     <td style={{padding: '15px', color: 'var(--text-muted)'}}>{new Date(course.created_at).toLocaleDateString('ar-EG')}</td>
@@ -203,7 +262,14 @@ export default function TeacherCourses() {
                       <span className="badge badge-primary">{course.status}</span>
                     </td>
                     <td style={{padding: '15px'}}>
-                      <div style={{display: 'flex', gap: '10px'}}>
+                      <div style={{display: 'flex', gap: '10px', flexWrap: 'wrap'}}>
+                        <button 
+                          className="btn btn-outline" 
+                          style={{padding: '5px 10px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px'}}
+                          onClick={() => openEditModal(course)}
+                        >
+                          <MdEdit /> تعديل
+                        </button>
                         <button 
                           className="btn btn-primary" 
                           style={{padding: '5px 10px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px'}}
@@ -228,19 +294,30 @@ export default function TeacherCourses() {
         )}
       </div>
 
-      {/* Modal - Add Course */}
+      {/* Modal - Add / Edit Course */}
       {showModal && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
           backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, 
           display: 'flex', justifyContent: 'center', alignItems: 'center'
         }}>
-          <div className="card fade-in" style={{width: '100%', maxWidth: '500px', padding: '30px'}}>
-            <h2 style={{margin: '0 0 20px 0', color: 'var(--primary-color)'}}>إضافة كورس جديد</h2>
-            <form onSubmit={handleAddCourse}>
+          <div className="card fade-in" style={{width: '100%', maxWidth: '500px', padding: '30px', maxHeight: '90vh', overflowY: 'auto'}}>
+            <h2 style={{margin: '0 0 20px 0', color: 'var(--primary-color)'}}>
+              {editingCourseId ? 'تعديل الكورس' : 'إضافة كورس جديد'}
+            </h2>
+            <form onSubmit={handleSaveCourse}>
               <div className="form-group">
                 <label>عنوان الكورس</label>
                 <input type="text" className="form-control" required value={newCourse.title} onChange={e => setNewCourse({...newCourse, title: e.target.value})} />
+              </div>
+              <div className="form-group">
+                <label>صورة مصغرة للكورس (رابط Image URL)</label>
+                <input type="url" className="form-control" placeholder="https://..." value={newCourse.image_url} onChange={e => setNewCourse({...newCourse, image_url: e.target.value})} />
+                {newCourse.image_url && (
+                  <div style={{marginTop: '10px', height: '120px', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--border-color)'}}>
+                    <img src={newCourse.image_url} alt="Preview" style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+                  </div>
+                )}
               </div>
               <div className="form-group">
                 <label>وصف الكورس</label>
@@ -248,7 +325,7 @@ export default function TeacherCourses() {
               </div>
               <div className="form-group">
                 <label>سعر الكورس (ج.م)</label>
-                <input type="number" className="form-control" required value={newCourse.price} onChange={e => setNewCourse({...newCourse, price: parseInt(e.target.value) || 0})} />
+                <input type="number" className="form-control" required value={newCourse.price} onChange={e => setNewCourse({...newCourse, price: parseFloat(e.target.value) || 0})} />
               </div>
               <div className="form-group">
                 <label>نوع الكورس</label>
@@ -259,7 +336,9 @@ export default function TeacherCourses() {
                 </select>
               </div>
               <div style={{display: 'flex', gap: '10px', marginTop: '20px'}}>
-                <button type="submit" className="btn btn-primary" style={{flex: 1}}>حفظ الكورس</button>
+                <button type="submit" className="btn btn-primary" style={{flex: 1}}>
+                  {editingCourseId ? 'حفظ التعديلات' : 'حفظ الكورس'}
+                </button>
                 <button type="button" className="btn btn-outline" style={{flex: 1}} onClick={() => setShowModal(false)}>إلغاء</button>
               </div>
             </form>
@@ -324,7 +403,7 @@ export default function TeacherCourses() {
                     <textarea className="form-control" rows="2" value={newLesson.description} onChange={e => setNewLesson({...newLesson, description: e.target.value})}></textarea>
                   </div>
                   <div className="form-group">
-                    <label>رابط الفيديو (YouTube / Vimeo / MP4)</label>
+                    <label>رابط الفيديو (YouTube)</label>
                     <input type="url" className="form-control" required placeholder="https://..." value={newLesson.video_url} onChange={e => setNewLesson({...newLesson, video_url: e.target.value})} />
                     <small className="text-muted" style={{display: 'block', marginTop: '5px'}}>يرجى التأكد من صلاحية الرابط ليعمل لدى الطالب.</small>
                   </div>
