@@ -9,6 +9,7 @@ import CourseCard from '../components/CourseCard';
 export default function Home() {
   const navigate = useNavigate();
   const [featuredCourses, setFeaturedCourses] = useState([]);
+  const [instructors, setInstructors] = useState([]);
 
   useEffect(() => {
     const fetchFeaturedCourses = async () => {
@@ -38,7 +39,24 @@ export default function Home() {
       }
     };
 
+    const fetchInstructors = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('role', 'teacher')
+          .limit(4);
+
+        if (data) {
+          setInstructors(data);
+        }
+      } catch (err) {
+        console.error('Error fetching instructors:', err);
+      }
+    };
+
     fetchFeaturedCourses();
+    fetchInstructors();
   }, []);
 
   return (
@@ -122,26 +140,17 @@ export default function Home() {
           <p className="section-subtitle">تعلم على يد خبراء المادة لضمان التفوق</p>
           
           <div className="instructors-grid">
-            <Link to="/instructor/أ. محمود حمدي" style={{textDecoration: 'none', color: 'inherit'}} className="instructor-card">
-              <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Instructor" className="instructor-img" />
-              <h3>أ. محمود حمدي</h3>
-              <p className="text-muted">أستاذ الفيزياء - خبرة 15 عاماً</p>
-            </Link>
-            <Link to="/instructor/أ. سامح عبد الله" style={{textDecoration: 'none', color: 'inherit'}} className="instructor-card">
-              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Instructor" className="instructor-img" />
-              <h3>أ. سامح عبد الله</h3>
-              <p className="text-muted">كبير معلمي الكيمياء</p>
-            </Link>
-            <Link to="/instructor/أ. إبراهيم محمد" style={{textDecoration: 'none', color: 'inherit'}} className="instructor-card">
-              <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Instructor" className="instructor-img" />
-              <h3>أ. إبراهيم محمد</h3>
-              <p className="text-muted">خبير اللغة العربية</p>
-            </Link>
-            <Link to="/instructor/أ. علي محمود" style={{textDecoration: 'none', color: 'inherit'}} className="instructor-card">
-              <img src="https://images.unsplash.com/photo-1580894732444-8ecded7900cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Instructor" className="instructor-img" />
-              <h3>أ. علي محمود</h3>
-              <p className="text-muted">مؤلف سلسلة المتميز في الرياضيات</p>
-            </Link>
+            {instructors.length > 0 ? (
+              instructors.map(instructor => (
+                <Link key={instructor.id} to={`/instructor/${instructor.name}`} style={{textDecoration: 'none', color: 'inherit'}} className="instructor-card">
+                  <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt={instructor.name} className="instructor-img" />
+                  <h3>{instructor.name}</h3>
+                  <p className="text-muted">معلم بالمنصة</p>
+                </Link>
+              ))
+            ) : (
+              <p style={{textAlign: 'center', width: '100%', color: 'var(--text-muted)'}}>لا يوجد معلمين متاحين حالياً.</p>
+            )}
           </div>
         </div>
       </section>
