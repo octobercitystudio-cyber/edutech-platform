@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import { MdAdd, MdEdit, MdDelete, MdOndemandVideo } from 'react-icons/md';
+import { MdAdd, MdEdit, MdDelete, MdOndemandVideo, MdClose } from 'react-icons/md';
 
 export default function TeacherCourses() {
   const [courses, setCourses] = useState([]);
@@ -13,6 +13,18 @@ export default function TeacherCourses() {
     type: 'اونلاين'
   });
   const [userName, setUserName] = useState('');
+
+  // Lesson Management States
+  const [showLessonsModal, setShowLessonsModal] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [lessons, setLessons] = useState([]);
+  const [loadingLessons, setLoadingLessons] = useState(false);
+  const [newLesson, setNewLesson] = useState({
+    title: '',
+    description: '',
+    video_url: '',
+    duration_minutes: 0
+  });
 
   useEffect(() => {
     fetchTeacherCourses();
@@ -61,14 +73,13 @@ export default function TeacherCourses() {
             description: newCourse.description,
             price: newCourse.price,
             instructor_name: userName,
-            status: 'مسودة', // Default to draft so admin can approve it, or active directly? Let's say 'نشط' for now for testing
+            status: 'نشط',
           }
         ])
         .select();
 
       if (error) throw error;
       
-      // Also set the type and status to 'نشط' directly to avoid friction
       await supabase.from('courses').update({ status: 'نشط', type: newCourse.type }).eq('id', data[0].id);
       
       alert('تم إضافة الكورس بنجاح!');
@@ -78,6 +89,74 @@ export default function TeacherCourses() {
     } catch (err) {
       console.error('Error adding course:', err);
       alert('حدث خطأ أثناء إضافة الكورس');
+    }
+  };
+
+  const handleDeleteCourse = async (courseId) => {
+    if(!window.confirm('هل أنت متأكد من حذف هذا الكورس؟')) return;
+    try {
+      await supabase.from('courses').delete().eq('id', courseId);
+      setCourses(courses.filter(c => c.id !== courseId));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // --- Lessons Logic ---
+  const handleManageContent = async (course) => {
+    setSelectedCourse(course);
+    setShowLessonsModal(true);
+    await fetchLessons(course.id);
+  };
+
+  const fetchLessons = async (courseId) => {
+    setLoadingLessons(true);
+    try {
+      const { data, error } = await supabase
+        .from('lessons')
+        .select('*')
+        .eq('course_id', courseId)
+        .order('order_index', { ascending: true });
+      if (error) throw error;
+      setLessons(data || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingLessons(false);
+    }
+  };
+
+  const handleAddLesson = async (e) => {
+    e.preventDefault();
+    try {
+      const orderIndex = lessons.length;
+      const { data, error } = await supabase.from('lessons').insert([{
+        course_id: selectedCourse.id,
+        title: newLesson.title,
+        description: newLesson.description,
+        video_url: newLesson.video_url,
+        duration_minutes: newLesson.duration_minutes,
+        order_index: orderIndex
+      }]).select();
+      
+      if (error) throw error;
+      setLessons([...lessons, data[0]]);
+      setNewLesson({ title: '', description: '', video_url: '', duration_minutes: 0 });
+    } catch (err) {
+      console.error(err);
+      alert('خطأ في إضافة الدرس');
+    }
+  };
+
+  const handleDeleteLesson = async (lessonId) => {
+    if (!window.confirm('هل أنت متأكد من حذف هذا الدرس؟')) return;
+    try {
+      const { error } = await supabase.from('lessons').delete().eq('id', lessonId);
+      if (error) throw error;
+      setLessons(lessons.filter(l => l.id !== lessonId));
+    } catch (err) {
+      console.error(err);
+      alert('خطأ في حذف الدرس');
     }
   };
 
@@ -125,10 +204,18 @@ export default function TeacherCourses() {
                     </td>
                     <td style={{padding: '15px'}}>
                       <div style={{display: 'flex', gap: '10px'}}>
-                        <button className="btn btn-outline" style={{padding: '5px 10px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px'}}>
-                          <MdEdit /> تعديل
+                        <button 
+                          className="btn btn-primary" 
+                          style={{padding: '5px 10px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px'}}
+                          onClick={() => handleManageContent(course)}
+                        >
+                          <MdOndemandVideo /> المحتوى
                         </button>
-                        <button className="btn btn-secondary" style={{padding: '5px 10px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px', backgroundColor: '#e74c3c', color: 'white'}}>
+                        <button 
+                          className="btn btn-secondary" 
+                          style={{padding: '5px 10px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px', backgroundColor: '#e74c3c', color: 'white'}}
+                          onClick={() => handleDeleteCourse(course.id)}
+                        >
                           <MdDelete /> حذف
                         </button>
                       </div>
@@ -141,6 +228,7 @@ export default function TeacherCourses() {
         )}
       </div>
 
+      {/* Modal - Add Course */}
       {showModal && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
@@ -175,6 +263,81 @@ export default function TeacherCourses() {
                 <button type="button" className="btn btn-outline" style={{flex: 1}} onClick={() => setShowModal(false)}>إلغاء</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal - Manage Lessons */}
+      {showLessonsModal && selectedCourse && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
+          backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1000, 
+          display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px'
+        }}>
+          <div className="card fade-in" style={{width: '100%', maxWidth: '800px', height: '90vh', display: 'flex', flexDirection: 'column'}}>
+            <div style={{padding: '20px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+              <h2 style={{margin: 0, color: 'var(--primary-color)'}}>إدارة محتوى الكورس: {selectedCourse.title}</h2>
+              <button className="btn btn-outline" style={{padding: '5px 10px'}} onClick={() => setShowLessonsModal(false)}><MdClose size={20} /></button>
+            </div>
+            
+            <div style={{display: 'flex', flex: 1, overflow: 'hidden'}}>
+              {/* قائمة الدروس الحالية */}
+              <div style={{flex: 1, borderRight: '1px solid var(--border-color)', padding: '20px', overflowY: 'auto'}}>
+                <h3 style={{marginTop: 0, marginBottom: '20px'}}>الدروس الحالية</h3>
+                {loadingLessons ? (
+                  <p className="text-muted">جاري تحميل الدروس...</p>
+                ) : lessons.length === 0 ? (
+                  <p className="text-muted" style={{textAlign: 'center', marginTop: '50px'}}>لم يتم إضافة أي دروس بعد.</p>
+                ) : (
+                  <ul style={{listStyle: 'none', padding: 0, margin: 0}}>
+                    {lessons.map((lesson, idx) => (
+                      <li key={lesson.id} style={{padding: '15px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', marginBottom: '10px', backgroundColor: '#f8fafc'}}>
+                        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                          <div>
+                            <strong>{idx + 1}. {lesson.title}</strong>
+                            <div style={{fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '5px'}}>المدة: {lesson.duration_minutes} دقيقة</div>
+                          </div>
+                          <button 
+                            style={{color: '#e74c3c', background: 'none', border: 'none', cursor: 'pointer', display: 'flex'}}
+                            onClick={() => handleDeleteLesson(lesson.id)}
+                            title="حذف الدرس"
+                          >
+                            <MdDelete size={20} />
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              {/* إضافة درس جديد */}
+              <div style={{flex: 1, padding: '20px', overflowY: 'auto', backgroundColor: '#f4f7f9'}}>
+                <h3 style={{marginTop: 0, marginBottom: '20px'}}>إضافة درس جديد</h3>
+                <form onSubmit={handleAddLesson}>
+                  <div className="form-group">
+                    <label>عنوان الدرس</label>
+                    <input type="text" className="form-control" required value={newLesson.title} onChange={e => setNewLesson({...newLesson, title: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>الوصف (اختياري)</label>
+                    <textarea className="form-control" rows="2" value={newLesson.description} onChange={e => setNewLesson({...newLesson, description: e.target.value})}></textarea>
+                  </div>
+                  <div className="form-group">
+                    <label>رابط الفيديو (YouTube / Vimeo / MP4)</label>
+                    <input type="url" className="form-control" required placeholder="https://..." value={newLesson.video_url} onChange={e => setNewLesson({...newLesson, video_url: e.target.value})} />
+                    <small className="text-muted" style={{display: 'block', marginTop: '5px'}}>يرجى التأكد من صلاحية الرابط ليعمل لدى الطالب.</small>
+                  </div>
+                  <div className="form-group">
+                    <label>مدة الدرس (بالدقائق)</label>
+                    <input type="number" className="form-control" required min="1" value={newLesson.duration_minutes} onChange={e => setNewLesson({...newLesson, duration_minutes: parseInt(e.target.value) || 0})} />
+                  </div>
+                  <button type="submit" className="btn btn-primary" style={{width: '100%', marginTop: '10px'}}>
+                    <MdAdd style={{marginLeft: '5px'}} /> حفظ الدرس
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -1,17 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const supabaseUrl = 'https://sgiasnlypaawkitflssu.supabase.co';
-const supabaseKey = 'sb_publishable_xIclSlUK2zD19I9FzxI1yg_nGFMxIgD';
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-async function check() {
-    console.log('--- PROFILES ---');
-    const { data: profiles } = await supabase.from('profiles').select('*');
-    profiles.forEach(p => console.log(`[${p.role}] ID: ${p.id} | Name: ${p.name} | Email: ${p.email}`));
-
-    console.log('\n--- COURSES ---');
-    const { data: courses } = await supabase.from('courses').select('*');
-    courses.forEach(c => console.log(`ID: ${c.id} | Title: ${c.title} | Teacher: ${c.instructor_name}`));
+async function test() {
+  const { data, error } = await supabase.from('lessons').select('*').limit(1);
+  console.log('Lessons data:', data);
+  console.log('Error:', error);
 }
 
-check();
+test();
