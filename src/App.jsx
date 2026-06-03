@@ -17,6 +17,9 @@ import MyCourses from './pages/MyCourses';
 import LessonViewer from './pages/LessonViewer';
 import Profile from './pages/Profile';
 import TeacherDashboard from './pages/TeacherDashboard';
+import TeacherCourses from './pages/TeacherCourses';
+import TeacherExams from './pages/TeacherExams';
+import TeacherStudents from './pages/TeacherStudents';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminUsers from './pages/AdminUsers';
 import AdminCourses from './pages/AdminCourses';
@@ -144,6 +147,9 @@ function App() {
         <Route path="/reports" element={<StudentReports />} />
         <Route path="/support" element={<Support />} />
         <Route path="/settings" element={<RoleSettings />} />
+        <Route path="/teacher-courses" element={<TeacherCourses />} />
+        <Route path="/teacher-exams" element={<TeacherExams />} />
+        <Route path="/teacher-students" element={<TeacherStudents />} />
       </Route>
       
       {/* Super Admin Routes */}
