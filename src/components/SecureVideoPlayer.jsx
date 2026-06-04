@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import ReactPlayer from 'react-player';
 import { MdPlayArrow, MdPause, MdVolumeUp, MdVolumeOff, MdFullscreen } from 'react-icons/md';
 
-export default function SecureVideoPlayer({ videoSrc }) {
+export default function SecureVideoPlayer({ videoSrc, onWatchProgress }) {
   const [isFocused, setIsFocused] = useState(true);
   const [watermarkPos, setWatermarkPos] = useState({ top: '10%', left: '10%' });
   
@@ -55,6 +55,9 @@ export default function SecureVideoPlayer({ videoSrc }) {
   const handleProgress = (state) => {
     if (!isSeeking) {
       setPlayed(state.played);
+      if (onWatchProgress) {
+        onWatchProgress(state.playedSeconds, duration);
+      }
     }
   };
 

@@ -115,6 +115,33 @@ export default function Dashboard() {
     }
   };
 
+  const handleJoinLive = async (task) => {
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData?.user) {
+        // Upsert attendance
+        const { data: existing } = await supabase
+          .from('attendance_records')
+          .select('id')
+          .eq('student_id', userData.user.id)
+          .eq('session_id', task.id)
+          .single();
+          
+        if (!existing) {
+          await supabase.from('attendance_records').insert({
+            student_id: userData.user.id,
+            session_id: task.id,
+            course_id: task.course_id,
+            status: 'present'
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Error saving attendance', err);
+    }
+    window.open(task.meeting_link, '_blank');
+  };
+
   const getStatusStyle = (status) => {
     if(status === 'مكتملة' || status === 'ناجحة') return { bg: '#ecfdf5', color: '#059669' };
     if(status === 'مرفوضة') return { bg: '#fef2f2', color: '#dc2626' };
@@ -330,8 +357,11 @@ export default function Dashboard() {
                       className={task.type === 'live' ? "btn btn-outline" : "btn btn-primary"} 
                       style={{width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px', borderColor: task.type === 'live' ? '#e74c3c' : '', color: task.type === 'live' ? '#e74c3c' : ''}}
                       onClick={() => {
-                        if(task.type === 'live') window.open(task.meeting_link, '_blank');
-                        else navigate('/assignments');
+                        if(task.type === 'live') {
+                          handleJoinLive(task);
+                        } else {
+                          navigate('/assignments');
+                        }
                       }}
                     >
                       {task.type === 'live' ? 'انضمام الآن' : 'ابدأ الآن'} <MdArrowForward />

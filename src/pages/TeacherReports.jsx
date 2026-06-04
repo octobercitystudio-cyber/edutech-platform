@@ -36,10 +36,10 @@ export default function TeacherReports() {
         .in('course_id', courseIds)
         .order('created_at', { ascending: false });
         
-      if (enrollments) {
+        if (enrollments) {
         const enrichedData = enrollments.map(en => ({
           ...en,
-          progress: Math.floor(Math.random() * 100) // Mock progress
+          progress: en.progress || 0 // Actual progress updated by video player
         }));
         setReportData(enrichedData);
       }

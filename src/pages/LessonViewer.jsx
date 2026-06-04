@@ -102,6 +102,83 @@ export default function LessonViewer() {
     );
   }
 
+  const lastSavedTimeRef = React.useRef(0);
+
+  const handleWatchProgress = async (playedSeconds, duration) => {
+    // Save every 10 seconds of progress
+    if (playedSeconds - lastSavedTimeRef.current >= 10) {
+      lastSavedTimeRef.current = playedSeconds;
+      
+      try {
+        const { data: userData } = await supabase.auth.getUser();
+        if (!userData?.user || !activeLesson) return;
+
+        // Update learning minutes in profiles
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('learning_minutes')
+          .eq('id', userData.user.id)
+          .single();
+        
+        if (profile) {
+          // Add roughly 10 seconds (1/6th of a minute)
+          await supabase
+            .from('profiles')
+            .update({ learning_minutes: (profile.learning_minutes || 0) + 0.16 })
+            .eq('id', userData.user.id);
+        }
+
+        // Upsert video_progress
+        const isCompleted = (playedSeconds / duration) > 0.9;
+        const { data: existingProgress } = await supabase
+          .from('video_progress')
+          .select('id')
+          .eq('student_id', userData.user.id)
+          .eq('lesson_id', activeLesson.id)
+          .single();
+
+        if (existingProgress) {
+          await supabase
+            .from('video_progress')
+            .update({ watched_seconds: Math.floor(playedSeconds), is_completed: isCompleted, last_watched_at: new Date() })
+            .eq('id', existingProgress.id);
+        } else {
+          await supabase
+            .from('video_progress')
+            .insert({
+              student_id: userData.user.id,
+              lesson_id: activeLesson.id,
+              course_id: id,
+              watched_seconds: Math.floor(playedSeconds),
+              is_completed: isCompleted
+            });
+        }
+
+        // If completed, update course enrollment progress
+        if (isCompleted) {
+          const { data: enrollment } = await supabase
+            .from('enrollments')
+            .select('progress, id')
+            .eq('student_id', userData.user.id)
+            .eq('course_id', id)
+            .single();
+          
+          if (enrollment && enrollment.progress < 100) {
+            // Rough calc: increase progress by 10% for each completed lesson, up to 100
+            const newProgress = Math.min(100, enrollment.progress + 10);
+            await supabase
+              .from('enrollments')
+              .update({ progress: newProgress })
+              .eq('id', enrollment.id);
+          }
+        }
+
+      } catch (err) {
+        console.error('Error tracking progress', err);
+      }
+    }
+  };
+
   return (
     <div style={{display: 'flex', flexDirection: 'column', height: '100%'}} className="fade-in">
       <div style={{padding: 'var(--space-4)', display: 'flex', alignItems: 'center', gap: '15px', borderBottom: '1px solid var(--border-color)', backgroundColor: 'white'}}>
@@ -116,7 +193,7 @@ export default function LessonViewer() {
         <div style={{flex: '2 1 600px', display: 'flex', flexDirection: 'column'}}>
           {activeLesson ? (
             <>
-              <SecureVideoPlayer videoSrc={activeLesson.video_url} />
+              <SecureVideoPlayer videoSrc={activeLesson.video_url} onWatchProgress={handleWatchProgress} />
               <div className="card fade-in" style={{padding: 'var(--space-4)', marginTop: 'var(--space-4)'}}>
                 <h2 style={{color: 'var(--text-main)', margin: '0 0 10px 0'}}>{activeLesson.title}</h2>
                 <div style={{fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '15px'}}>المدة: {activeLesson.duration_minutes} دقيقة</div>
