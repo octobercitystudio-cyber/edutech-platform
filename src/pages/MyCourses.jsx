@@ -1,38 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { MdClass, MdCastForEducation, MdMenuBook, MdPlayCircleFilled, MdAssignment, MdPlayArrow, MdClose, MdCheck, MdTrendingUp, MdCheckCircle } from 'react-icons/md';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
+import { MdMenuBook, MdSearch, MdPlayCircleFilled, MdAssignmentTurnedIn, MdFolder, MdCheckCircle } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 
 export default function MyCourses() {
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [activeTab, setActiveTab] = useState('summary');
   const [myCourses, setMyCourses] = useState([]);
+  const [filteredCourses, setFilteredCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [courseLessons, setCourseLessons] = useState([]);
-  const [loadingLessons, setLoadingLessons] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeFilter, setActiveFilter] = useState('All'); // All, Active, Completed
+  
+  const [stats, setStats] = useState({
+    totalCourses: 0,
+    completedLessons: 0,
+    testsPassed: 0,
+    files: 0
+  });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchMyCourses();
   }, []);
 
   useEffect(() => {
-    if (selectedCourse) {
-      fetchLessons(selectedCourse.courseId);
-    }
-  }, [selectedCourse]);
-
-  const fetchLessons = async (courseId) => {
-    setLoadingLessons(true);
-    try {
-      const { data, error } = await supabase.from('lessons').select('*').eq('course_id', courseId).order('order_index', { ascending: true });
-      if (error) throw error;
-      setCourseLessons(data || []);
-    } catch (err) {
-      console.error('Error fetching lessons:', err);
-    } finally {
-      setLoadingLessons(false);
-    }
-  };
+    filterCourses();
+  }, [searchTerm, activeFilter, myCourses]);
 
   const fetchMyCourses = async () => {
     try {
@@ -55,16 +48,28 @@ export default function MyCourses() {
           id: enrollment.id,
           courseId: enrollment.courses.id,
           title: enrollment.courses.title,
-          status: enrollment.courses.status,
-          type: 'اونلاين',
+          status: enrollment.courses.status, // نشط، مسودة، مغلق
+          type: enrollment.courses.type || 'اونلاين',
           instructor: enrollment.courses.instructor_name || 'غير محدد',
-          attendance: enrollment.progress || 0,
-          avgGrade: 0,
-          completedLessons: Math.floor(enrollment.progress / 10) || 0,
-          stats: { videos: 2, files: 0, exams: 0, seminars: 0, web: 1 },
-          price: enrollment.courses.price
+          progress: enrollment.progress || 0,
+          thumbnail: enrollment.courses.thumbnail_url || 'https://images.unsplash.com/photo-1516321497487-e288fb19713f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60'
         }));
+        
         setMyCourses(formattedCourses);
+        setFilteredCourses(formattedCourses);
+        
+        // Calculate basic stats
+        let completed = 0;
+        formattedCourses.forEach(c => {
+          completed += Math.floor(c.progress / 10); // Mock: every 10% = 1 lesson
+        });
+        
+        setStats({
+          totalCourses: formattedCourses.length,
+          completedLessons: completed,
+          testsPassed: Math.floor(completed / 3), // Mock
+          files: formattedCourses.length * 2 // Mock
+        });
       } else {
         setMyCourses([]);
       }
@@ -75,509 +80,192 @@ export default function MyCourses() {
     }
   };
 
-  const lineData = [
-    { name: 'day 1', value: 0 },
-    { name: 'day 2', value: 0 },
-    { name: 'day 3', value: 0 },
-    { name: 'day 4', value: 0 },
-    { name: 'day 5', value: 0 },
-    { name: 'day 6', value: 0 },
-    { name: 'day 7', value: 2.8 },
-  ];
+  const filterCourses = () => {
+    let result = myCourses;
+    
+    // Search filter
+    if (searchTerm) {
+      result = result.filter(c => c.title.toLowerCase().includes(searchTerm.toLowerCase()));
+    }
+    
+    // Tab filter
+    if (activeFilter === 'Active') {
+      result = result.filter(c => c.progress < 100);
+    } else if (activeFilter === 'Completed') {
+      result = result.filter(c => c.progress >= 100);
+    }
+    
+    setFilteredCourses(result);
+  };
 
-  const renderTabContent = () => {
-    switch(activeTab) {
-      case 'lessons':
-        return (
-          <div className="fade-in" style={{marginTop: '30px'}}>
-            <div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: '20px'}}>
-              <h3 className="text-primary">محتوى الفصل (الدروس)</h3>
-            </div>
-            {loadingLessons ? (
-              <div style={{textAlign: 'center', padding: '30px', color: 'var(--text-muted)'}}>جاري تحميل الدروس...</div>
-            ) : courseLessons.length === 0 ? (
-              <div style={{textAlign: 'center', padding: '40px', backgroundColor: '#f8fafc', borderRadius: '10px', color: 'var(--text-muted)'}}>
-                <MdPlayCircleFilled size={50} color="#cbd5e1" style={{marginBottom: '10px'}} />
-                <p>لم يتم إضافة دروس لهذا الكورس بعد.</p>
-              </div>
-            ) : (
-              <div style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
-                {courseLessons.map((lesson, idx) => (
-                  <div key={lesson.id} className="branded-card" style={{padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                    <div style={{display: 'flex', alignItems: 'center', gap: '15px'}}>
-                      <div style={{width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(15, 76, 129, 0.1)', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'var(--primary-color)', fontWeight: 'bold'}}>
-                        {idx + 1}
-                      </div>
-                      <div>
-                        <h4 style={{margin: 0, fontSize: '1.1rem', color: 'var(--text-main)'}}>{lesson.title}</h4>
-                        <div style={{fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '5px'}}>المدة: {lesson.duration_minutes} دقيقة</div>
-                      </div>
-                    </div>
-                    <button 
-                      className="btn btn-primary" 
-                      style={{padding: '8px 20px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '5px'}}
-                      onClick={() => window.location.href = `/lesson/${selectedCourse.courseId}?lessonId=${lesson.id}`}
-                    >
-                      <MdPlayCircleFilled size={20} /> شاهد الآن
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        );
+  // Modern minimalist Blue/White styling
+  const pageStyles = {
+    container: { padding: '40px 0', backgroundColor: '#f8fafc', minHeight: '100vh', direction: 'rtl' },
+    wrapper: { maxWidth: '1200px', margin: '0 auto', padding: '0 20px' },
+    pageTitle: { color: '#0f4c81', margin: '0 0 30px 0', fontSize: '2rem', fontWeight: '800' },
+    
+    // Stats Bar
+    statsBar: { display: 'flex', gap: '20px', marginBottom: '30px', flexWrap: 'wrap' },
+    statWidget: { 
+      flex: '1 1 200px', backgroundColor: 'white', padding: '20px', borderRadius: '15px', 
+      boxShadow: '0 4px 6px rgba(0,0,0,0.02)', border: '1px solid #e2e8f0',
+      display: 'flex', alignItems: 'center', gap: '15px'
+    },
+    statIcon: { width: '50px', height: '50px', borderRadius: '12px', backgroundColor: '#f1f5f9', color: '#0f4c81', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '1.5rem' },
+    statValue: { fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b', margin: 0 },
+    statLabel: { fontSize: '0.9rem', color: '#64748b', margin: 0 },
 
-      case 'webinars':
-        return (
-          <div className="fade-in" style={{marginTop: '30px'}}>
-            <div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: '20px'}}>
-              <h3 className="text-primary">الندوات المباشرة (Webinars)</h3>
-            </div>
-            
-            <div style={{display: 'flex', gap: '20px', flexWrap: 'wrap'}}>
-              <div className="branded-card" style={styles.statCard}>
-                <div>
-                  <div style={styles.statLabel}>لم تبدأ</div>
-                  <div style={styles.statValue}>0</div>
-                </div>
-                <div style={styles.lightIcon}><MdPlayArrow /></div>
-              </div>
-              <div className="branded-card" style={styles.statCard}>
-                <div>
-                  <div style={styles.statLabel}>غياب</div>
-                  <div style={styles.statValue}>0</div>
-                </div>
-                <div style={styles.lightIcon}><MdClose /></div>
-              </div>
-              <div className="branded-card" style={styles.statCard}>
-                <div>
-                  <div style={styles.statLabel}>حضور</div>
-                  <div style={styles.statValue}>0</div>
-                </div>
-                <div style={styles.lightIcon}><MdCheck /></div>
-              </div>
-              <div className="branded-card" style={styles.statCard}>
-                <div>
-                  <div style={styles.statLabel}>تم التسجيل</div>
-                  <div style={styles.statValue}>0</div>
-                </div>
-                <div style={styles.lightIcon}><MdAssignment /></div>
-              </div>
-            </div>
-          </div>
-        );
-        
-      case 'exams':
-        return (
-          <div className="fade-in" style={{marginTop: '30px'}}>
-            <div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: '20px'}}>
-              <h3 className="text-primary">الامتحانات</h3>
-            </div>
-            
-            <div style={{display: 'flex', gap: '20px', flexWrap: 'wrap'}}>
-              <div className="lightglass-card" style={styles.statCard}>
-                <div>
-                  <div style={styles.statLabel}>لم يبدأ</div>
-                  <div style={styles.statValue}>0</div>
-                </div>
-                <div style={styles.lightIcon}><MdPlayArrow /></div>
-              </div>
-              <div className="lightglass-card" style={styles.statCard}>
-                <div>
-                  <div style={styles.statLabel}>فشل الاختبار</div>
-                  <div style={styles.statValue}>0</div>
-                </div>
-                <div style={styles.lightIcon}><MdClose /></div>
-              </div>
-              <div className="lightglass-card" style={styles.statCard}>
-                <div>
-                  <div style={styles.statLabel}>تم الاجتياز</div>
-                  <div style={styles.statValue}>0</div>
-                </div>
-                <div style={styles.lightIcon}><MdCheck /></div>
-              </div>
-              <div className="lightglass-card" style={styles.statCard}>
-                <div>
-                  <div style={styles.statLabel}>متوسط درجة</div>
-                  <div style={styles.statValue}>0.0%</div>
-                </div>
-                <div style={styles.lightIcon}><MdTrendingUp /></div>
-              </div>
-            </div>
+    // Controls (Search & Filters)
+    controlsBar: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' },
+    searchBox: { 
+      display: 'flex', alignItems: 'center', backgroundColor: 'white', border: '1px solid #e2e8f0', 
+      borderRadius: '30px', padding: '10px 20px', width: '100%', maxWidth: '400px'
+    },
+    searchInput: { border: 'none', outline: 'none', width: '100%', backgroundColor: 'transparent', marginLeft: '10px', fontSize: '0.95rem' },
+    filterTabs: { display: 'flex', gap: '10px', backgroundColor: 'white', padding: '5px', borderRadius: '30px', border: '1px solid #e2e8f0' },
+    tabBtn: (isActive) => ({
+      padding: '8px 20px', borderRadius: '25px', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem', transition: '0.3s',
+      backgroundColor: isActive ? '#0f4c81' : 'transparent',
+      color: isActive ? 'white' : '#64748b'
+    }),
 
-            <div style={{marginTop: '30px', display: 'flex', flexDirection: 'column', gap: '20px'}}>
-              <div style={{display: 'flex', color: 'var(--text-muted)', fontSize: '0.9rem', padding: '0 20px', textAlign: 'center'}}>
-                <div style={{flex: 1}}>تاريخ المحاولة</div>
-                <div style={{flex: 1}}>النتيجة</div>
-                <div style={{flex: 1}}>الحالة</div>
-                <div style={{flex: 1}}>عدد المحاولات</div>
-                <div style={{flex: 1}}>الاختبار</div>
-              </div>
-              <div style={{textAlign: 'center', color: 'var(--text-muted)', padding: '20px'}}>لا توجد امتحانات متاحة حالياً</div>
-            </div>
-          </div>
-        );
-
-      case 'attendance':
-        return (
-          <div className="fade-in" style={{marginTop: '30px'}}>
-            <div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: '20px'}}>
-              <h3 className="text-primary">الحضور والغياب</h3>
-            </div>
-            
-            <div style={{display: 'flex', gap: '20px', flexWrap: 'wrap'}}>
-              <div className="lightglass-card" style={{...styles.statCard, flex: '1.5'}}>
-                <div>
-                  <div style={styles.statLabel}>وقت التعلم</div>
-                  <div style={styles.statValue}>0 دقيقة</div>
-                </div>
-                <div style={styles.lightIcon}><MdCheckCircle /></div>
-              </div>
-              <div className="lightglass-card" style={styles.statCard}>
-                <div>
-                  <div style={styles.statLabel}>مكتمل</div>
-                  <div style={styles.statValue}>0</div>
-                </div>
-                <div style={styles.lightIcon}><MdCheck /></div>
-              </div>
-              <div className="lightglass-card" style={styles.statCard}>
-                <div>
-                  <div style={styles.statLabel}>غياب</div>
-                  <div style={styles.statValue}>0</div>
-                </div>
-                <div style={styles.lightIcon}><MdClose /></div>
-              </div>
-            </div>
-
-            <div style={{marginTop: '30px', textAlign: 'center', color: 'var(--text-muted)', padding: '20px'}}>
-              سجل الحضور فارغ حالياً
-            </div>
-          </div>
-        );
-
-      case 'summary':
-      default:
-        return (
-          <div className="fade-in" style={{display: 'flex', gap: '20px', marginTop: '30px', flexWrap: 'wrap'}}>
-            <div style={{flex: '2 1 500px', display: 'flex', flexDirection: 'column', gap: '20px'}}>
-              
-              <div style={{display: 'flex', gap: '20px'}}>
-                <div className="branded-card" style={{flex: 1, padding: '20px', textAlign: 'center'}}>
-                  <h4 style={{margin: '0 0 15px 0', color: 'var(--text-muted)'}}>نسبة الإنجاز (Progress)</h4>
-                  <div style={{...styles.circleProgress, borderColor: 'var(--primary-color)', color: 'var(--primary-color)'}}>{selectedCourse.attendance}%</div>
-                </div>
-                <div className="branded-card" style={{flex: 1, padding: '20px', textAlign: 'center'}}>
-                  <h4 style={{margin: '0 0 15px 0', color: 'var(--text-muted)'}}>متوسط الدرجة</h4>
-                  <div style={{...styles.circleProgress, borderColor: 'var(--secondary-color)', color: 'var(--secondary-color)'}}>{selectedCourse.avgGrade}%</div>
-                </div>
-              </div>
-
-              <div className="branded-card" style={{padding: '20px'}}>
-                <h4 style={{margin: '0 0 15px 0', color: 'var(--text-muted)', textAlign: 'right'}}>وحدات مكتملة</h4>
-                <div style={{height: '200px'}}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={lineData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.5)" />
-                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: 'var(--text-muted)'}} />
-                      <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: 'var(--text-muted)'}} ticks={[1, 2, 3]} />
-                      <RechartsTooltip contentStyle={{backgroundColor: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.5)', borderRadius: '8px', color: 'var(--text-main)', boxShadow: '0 4px 10px rgba(0,0,0,0.05)'}} />
-                      <Area type="linear" dataKey="value" stroke="var(--primary-color)" fill="var(--primary-color)" fillOpacity={0.1} strokeWidth={3} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-              
-            </div>
-
-            <div style={{flex: '1 1 250px', display: 'flex', flexDirection: 'column', gap: '20px'}}>
-              
-              <div className="branded-card" style={{overflow: 'hidden'}}>
-                <div style={{backgroundColor: '#f8fafc', color: 'var(--text-main)', padding: '15px', textAlign: 'center', fontWeight: 'bold', borderBottom: '1px solid var(--border-color)'}}>
-                  {selectedCourse.type}
-                </div>
-                <div style={{padding: '30px 20px', textAlign: 'center'}}>
-                  <span style={{color: 'var(--secondary-color)', fontSize: '0.8rem', fontWeight: 'bold'}}>مدرس المادة 📌</span>
-                  <div style={{fontSize: '0.8rem', color: 'var(--text-muted)', margin: '10px 0'}}>يتم تدريسه من قبل</div>
-                  <h3 style={{margin: 0, color: 'var(--text-main)'}}>{selectedCourse.instructor}</h3>
-                </div>
-                <div style={{backgroundColor: 'var(--primary-color)', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold'}}>
-                  {selectedCourse.status}
-                </div>
-              </div>
-
-            </div>
-          </div>
-        );
+    // Grid
+    grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '30px' },
+    
+    // Course Card
+    card: { 
+      backgroundColor: 'white', borderRadius: '20px', overflow: 'hidden', 
+      border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.03)',
+      display: 'flex', flexDirection: 'column', transition: 'transform 0.3s'
+    },
+    thumbnail: { width: '100%', height: '180px', objectFit: 'cover' },
+    cardBody: { padding: '25px', display: 'flex', flexDirection: 'column', flex: 1 },
+    tagsContainer: { display: 'flex', gap: '10px', marginBottom: '15px' },
+    tag: { padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 'bold', backgroundColor: '#f1f5f9', color: '#475569' },
+    tagActive: { backgroundColor: '#ecfdf5', color: '#059669' },
+    cardTitle: { fontSize: '1.25rem', fontWeight: '800', color: '#1e293b', margin: '0 0 20px 0', lineHeight: '1.4' },
+    progressSection: { marginBottom: '25px', marginTop: 'auto' },
+    progressHeader: { display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#64748b', marginBottom: '8px', fontWeight: 'bold' },
+    progressBarBg: { height: '8px', backgroundColor: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' },
+    progressBarFill: (progress) => ({ height: '100%', backgroundColor: progress === 100 ? '#10b981' : '#0f4c81', width: `${progress}%`, transition: 'width 0.5s' }),
+    actionBtn: { 
+      width: '100%', padding: '12px', border: 'none', borderRadius: '10px', 
+      backgroundColor: '#0f4c81', color: 'white', fontWeight: 'bold', fontSize: '1rem',
+      cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px',
+      transition: 'background 0.2s'
     }
   };
 
   return (
-    <div className="fade-in" style={{padding: '20px 0', display: 'flex', gap: '20px', alignItems: 'flex-start'}}>
-      
-      {/* Main Content Area */}
-      <div style={{flex: 1}}>
-        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px'}}>
-          {loading && <span className="text-primary">جاري جلب بيانات الكورسات...</span>}
-          <h2 style={{margin: 0, color: 'var(--primary-color)', marginLeft: 'auto', fontWeight: '800'}}>فصولي الحالية</h2>
+    <div style={pageStyles.container}>
+      <div style={pageStyles.wrapper} className="fade-in">
+        
+        <h1 style={pageStyles.pageTitle}>دوراتي التعليمية (My Courses)</h1>
+
+        {/* Stats Bar */}
+        <div style={pageStyles.statsBar}>
+          <div style={pageStyles.statWidget}>
+            <div style={pageStyles.statIcon}><MdMenuBook /></div>
+            <div>
+              <p style={pageStyles.statValue}>{stats.totalCourses}</p>
+              <p style={pageStyles.statLabel}>Total Courses</p>
+            </div>
+          </div>
+          <div style={pageStyles.statWidget}>
+            <div style={pageStyles.statIcon}><MdPlayCircleFilled /></div>
+            <div>
+              <p style={pageStyles.statValue}>{stats.completedLessons}</p>
+              <p style={pageStyles.statLabel}>Completed Lessons</p>
+            </div>
+          </div>
+          <div style={pageStyles.statWidget}>
+            <div style={pageStyles.statIcon}><MdCheckCircle /></div>
+            <div>
+              <p style={pageStyles.statValue}>{stats.testsPassed}</p>
+              <p style={pageStyles.statLabel}>Tests Passed</p>
+            </div>
+          </div>
+          <div style={pageStyles.statWidget}>
+            <div style={pageStyles.statIcon}><MdFolder /></div>
+            <div>
+              <p style={pageStyles.statValue}>{stats.files}</p>
+              <p style={pageStyles.statLabel}>Files</p>
+            </div>
+          </div>
         </div>
 
-        {/* Course List */}
-        {!selectedCourse && (
-          <div style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
-            {!loading && myCourses.length === 0 ? (
-              <div className="branded-card" style={{textAlign: 'center', padding: '60px', backgroundColor: '#fff'}}>
-                <MdMenuBook size={60} color="#cbd5e1" />
-                <h3 style={{color: 'var(--text-muted)', marginTop: '15px', fontWeight: 'bold'}}>أنت لست مشتركاً في أي كورس حالياً.</h3>
-              </div>
-            ) : (
-              myCourses.map(course => (
-                <div key={course.id} className="branded-card" style={styles.courseItemCard}>
-                  <div style={{display: 'flex', alignItems: 'center', gap: '20px', flex: 1, justifyContent: 'flex-end'}}>
-                    <div style={{textAlign: 'right'}}>
-                      <h3 style={{margin: 0, fontSize: '1.2rem', color: 'var(--primary-color)', fontWeight: 'bold'}}>{course.title}</h3>
-                    </div>
-                    <span style={styles.badgeBlue}>{course.status}</span>
-                    <span style={{color: 'var(--text-muted)', fontSize: '0.9rem'}}>{course.type}</span>
+        {/* Controls Bar */}
+        <div style={pageStyles.controlsBar}>
+          <div style={pageStyles.searchBox}>
+            <MdSearch size={24} color="#94a3b8" />
+            <input 
+              type="text" 
+              placeholder="ابحث عن كورس..." 
+              style={pageStyles.searchInput} 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          
+          <div style={pageStyles.filterTabs}>
+            <button style={pageStyles.tabBtn(activeFilter === 'All')} onClick={() => setActiveFilter('All')}>All</button>
+            <button style={pageStyles.tabBtn(activeFilter === 'Active')} onClick={() => setActiveFilter('Active')}>Active</button>
+            <button style={pageStyles.tabBtn(activeFilter === 'Completed')} onClick={() => setActiveFilter('Completed')}>Completed</button>
+          </div>
+        </div>
+
+        {/* Grid */}
+        {loading ? (
+          <div style={{textAlign: 'center', padding: '50px', color: '#64748b'}}>جاري التحميل...</div>
+        ) : filteredCourses.length === 0 ? (
+          <div style={{textAlign: 'center', padding: '80px 20px', backgroundColor: 'white', borderRadius: '20px', border: '1px solid #e2e8f0'}}>
+            <MdMenuBook size={60} color="#cbd5e1" style={{marginBottom: '20px'}} />
+            <h2 style={{color: '#475569', margin: 0}}>لا توجد كورسات مطابقة</h2>
+          </div>
+        ) : (
+          <div style={pageStyles.grid}>
+            {filteredCourses.map(course => (
+              <div 
+                key={course.id} 
+                style={pageStyles.card} 
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <img src={course.thumbnail} alt={course.title} style={pageStyles.thumbnail} />
+                
+                <div style={pageStyles.cardBody}>
+                  <div style={pageStyles.tagsContainer}>
+                    <span style={{...pageStyles.tag, ...pageStyles.tagActive}}>{course.status === 'نشط' ? 'Active' : course.status}</span>
+                    <span style={pageStyles.tag}>{course.type === 'اونلاين' ? 'Online' : 'Offline'}</span>
                   </div>
                   
-                  <div style={{display: 'flex', alignItems: 'center', gap: '20px'}}>
-                    <button style={styles.btnOutline} onClick={() => { setSelectedCourse(course); setActiveTab('summary'); }}>عرض المحتوى</button>
-                    <span className="text-secondary" style={{display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 'bold'}}>
-                      دخول الفصل ⬅️
-                    </span>
+                  <h3 style={pageStyles.cardTitle}>{course.title}</h3>
+                  
+                  <div style={pageStyles.progressSection}>
+                    <div style={pageStyles.progressHeader}>
+                      <span>مكتمل</span>
+                      <span>{course.progress}%</span>
+                    </div>
+                    <div style={pageStyles.progressBarBg}>
+                      <div style={pageStyles.progressBarFill(course.progress)}></div>
+                    </div>
                   </div>
+                  
+                  <button 
+                    style={pageStyles.actionBtn}
+                    onClick={() => navigate(`/lesson/${course.courseId}`)}
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#0a365c'}
+                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#0f4c81'}
+                  >
+                    Enter Class <MdPlayCircleFilled size={20} />
+                  </button>
                 </div>
-              ))
-            )}
-          </div>
-        )}
-
-        {/* Course Details */}
-        {selectedCourse && (
-          <div className="branded-card" style={styles.card}>
-            {/* Header Tabs */}
-            <div style={styles.tabsContainer}>
-              <span 
-                style={{color: 'var(--primary-color)', fontWeight: 'bold', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px'}}
-                onClick={() => setSelectedCourse(null)}
-              >
-                {selectedCourse.title} ⬅️
-              </span>
-              <div style={{display: 'flex', gap: '10px'}}>
-                <span style={activeTab === 'lessons' ? styles.activeTabItem : styles.tabItem} onClick={() => setActiveTab('lessons')}>الدروس</span>
-                <span style={activeTab === 'summary' ? styles.activeTabItem : styles.tabItem} onClick={() => setActiveTab('summary')}>ملخص الفصل</span>
-                <span style={activeTab === 'webinars' ? styles.activeTabItem : styles.tabItem} onClick={() => setActiveTab('webinars')}>الندوات</span>
-                <span style={activeTab === 'exams' ? styles.activeTabItem : styles.tabItem} onClick={() => setActiveTab('exams')}>الامتحانات</span>
-                <span style={activeTab === 'attendance' ? styles.activeTabItem : styles.tabItem} onClick={() => setActiveTab('attendance')}>الحضور</span>
               </div>
-            </div>
-
-            {renderTabContent()}
+            ))}
           </div>
         )}
-      </div>
-
-      {/* Achievements Sidebar */}
-      <div className="branded-card" style={styles.achievementsSidebar}>
-        <h3 style={{textAlign: 'center', margin: '0 0 30px 0', color: 'var(--primary-color)', fontSize: '1.2rem', fontWeight: 'bold'}}>انجازاتي</h3>
-        
-        <div style={styles.achievementItem}>
-          <div style={{...styles.iconWrapper, backgroundColor: 'rgba(15, 76, 129, 0.1)', color: 'var(--primary-color)'}}>
-            <MdClass size={30} />
-          </div>
-          <div style={{...styles.achieveValue, color: 'var(--primary-color)'}}>{myCourses.length}</div>
-          <div style={styles.achieveLabel}>كورس مشترك</div>
-        </div>
-
-        <div style={styles.achievementItem}>
-          <div style={{...styles.iconWrapper, backgroundColor: 'rgba(15, 76, 129, 0.1)', color: 'var(--primary-color)'}}>
-            <MdCastForEducation size={30} />
-          </div>
-          <div style={{...styles.achieveValue, color: 'var(--primary-color)'}}>
-            {selectedCourse ? selectedCourse.completedLessons : 0}
-          </div>
-          <div style={styles.achieveLabel}>حصص مكتملة</div>
-        </div>
-
-        {/* Small bottom icons */}
-        <div style={{display: 'flex', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '30px', borderTop: '1px solid var(--border-color)'}}>
-          <div style={styles.smallAchieve}>
-            <div style={{...styles.smallIcon, backgroundColor: 'rgba(255, 183, 3, 0.15)', color: 'var(--secondary-hover)'}}><MdMenuBook /></div>
-            <div style={{...styles.achieveValueSmall, color: 'var(--text-main)'}}>0</div>
-            <div style={styles.achieveLabelSmall}>ملفات</div>
-          </div>
-          <div style={styles.smallAchieve}>
-            <div style={{...styles.smallIcon, backgroundColor: 'rgba(255, 183, 3, 0.15)', color: 'var(--secondary-hover)'}}><MdPlayCircleFilled /></div>
-            <div style={{...styles.achieveValueSmall, color: 'var(--text-main)'}}>0</div>
-            <div style={styles.achieveLabelSmall}>فيديوهات</div>
-          </div>
-          <div style={styles.smallAchieve}>
-            <div style={{...styles.smallIcon, backgroundColor: 'rgba(255, 183, 3, 0.15)', color: 'var(--secondary-hover)'}}><MdAssignment /></div>
-            <div style={{...styles.achieveValueSmall, color: 'var(--text-main)'}}>0</div>
-            <div style={styles.achieveLabelSmall}>اختبارات</div>
-          </div>
-        </div>
 
       </div>
-
     </div>
   );
 }
-
-const styles = {
-  achievementsSidebar: {
-    width: '280px',
-    padding: '30px 20px',
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '80vh'
-  },
-  achievementItem: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginBottom: '35px'
-  },
-  iconWrapper: {
-    width: '70px',
-    height: '70px',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: '15px'
-  },
-  achieveValue: {
-    fontSize: '2.5rem',
-    fontWeight: 'bold',
-    marginBottom: '5px',
-  },
-  achieveLabel: {
-    fontSize: '1rem',
-    color: 'var(--text-muted)',
-    fontWeight: 'bold'
-  },
-  smallAchieve: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center'
-  },
-  smallIcon: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '1.2rem',
-    marginBottom: '10px'
-  },
-  achieveValueSmall: {
-    fontSize: '1.2rem',
-    fontWeight: 'bold',
-    marginBottom: '5px'
-  },
-  achieveLabelSmall: {
-    fontSize: '0.8rem',
-    color: 'var(--text-muted)',
-    textAlign: 'center'
-  },
-  courseItemCard: {
-    padding: '25px 30px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    transition: 'transform 0.2s',
-    cursor: 'pointer'
-  },
-  badgeBlue: {
-    backgroundColor: 'rgba(15, 76, 129, 0.1)',
-    color: 'var(--primary-color)',
-    border: '1px solid rgba(15, 76, 129, 0.2)',
-    padding: '5px 15px',
-    borderRadius: '8px',
-    fontSize: '0.85rem',
-    fontWeight: 'bold'
-  },
-  btnOutline: {
-    border: '1px solid var(--primary-color)',
-    color: 'var(--primary-color)',
-    backgroundColor: 'transparent',
-    padding: '8px 30px',
-    borderRadius: '20px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    transition: 'all 0.2s'
-  },
-  card: {
-    padding: '25px',
-  },
-  tabsContainer: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottom: '1px solid var(--border-color)',
-    paddingBottom: '15px'
-  },
-  tabItem: {
-    color: 'var(--text-muted)',
-    cursor: 'pointer',
-    fontSize: '0.9rem',
-    fontWeight: 'bold',
-    padding: '8px 15px',
-    transition: '0.2s'
-  },
-  activeTabItem: {
-    color: 'var(--primary-color)',
-    backgroundColor: 'rgba(15, 76, 129, 0.05)',
-    border: '1px solid rgba(15, 76, 129, 0.1)',
-    padding: '8px 15px',
-    borderRadius: '20px',
-    fontSize: '0.9rem',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-  },
-  circleProgress: {
-    width: '120px',
-    height: '120px',
-    borderRadius: '50%',
-    borderWidth: '8px',
-    borderStyle: 'solid',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '2.5rem',
-    fontWeight: 'bold',
-    margin: '0 auto',
-  },
-  statCard: {
-    flex: 1,
-    minWidth: '150px',
-    padding: '20px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  statLabel: {
-    color: 'var(--text-muted)',
-    fontSize: '0.9rem',
-    marginBottom: '5px'
-  },
-  statValue: {
-    fontSize: '1.8rem',
-    fontWeight: 'bold',
-    color: 'var(--text-main)'
-  },
-  lightIcon: {
-    width: '45px',
-    height: '45px',
-    backgroundColor: '#f8fafc',
-    color: 'var(--primary-color)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '1.5rem'
-  }
-};
