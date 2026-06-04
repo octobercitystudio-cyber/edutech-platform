@@ -168,28 +168,28 @@ export default function MyCourses() {
             <div style={pageStyles.statIcon}><MdMenuBook /></div>
             <div>
               <p style={pageStyles.statValue}>{stats.totalCourses}</p>
-              <p style={pageStyles.statLabel}>Total Courses</p>
+              <p style={pageStyles.statLabel}>إجمالي الكورسات</p>
             </div>
           </div>
           <div style={pageStyles.statWidget}>
             <div style={pageStyles.statIcon}><MdPlayCircleFilled /></div>
             <div>
               <p style={pageStyles.statValue}>{stats.completedLessons}</p>
-              <p style={pageStyles.statLabel}>Completed Lessons</p>
+              <p style={pageStyles.statLabel}>الدروس المكتملة</p>
             </div>
           </div>
           <div style={pageStyles.statWidget}>
             <div style={pageStyles.statIcon}><MdCheckCircle /></div>
             <div>
               <p style={pageStyles.statValue}>{stats.testsPassed}</p>
-              <p style={pageStyles.statLabel}>Tests Passed</p>
+              <p style={pageStyles.statLabel}>الاختبارات المجتازة</p>
             </div>
           </div>
           <div style={pageStyles.statWidget}>
             <div style={pageStyles.statIcon}><MdFolder /></div>
             <div>
               <p style={pageStyles.statValue}>{stats.files}</p>
-              <p style={pageStyles.statLabel}>Files</p>
+              <p style={pageStyles.statLabel}>الملفات</p>
             </div>
           </div>
         </div>
@@ -208,9 +208,9 @@ export default function MyCourses() {
           </div>
           
           <div style={pageStyles.filterTabs}>
-            <button style={pageStyles.tabBtn(activeFilter === 'All')} onClick={() => setActiveFilter('All')}>All</button>
-            <button style={pageStyles.tabBtn(activeFilter === 'Active')} onClick={() => setActiveFilter('Active')}>Active</button>
-            <button style={pageStyles.tabBtn(activeFilter === 'Completed')} onClick={() => setActiveFilter('Completed')}>Completed</button>
+            <button style={pageStyles.tabBtn(activeFilter === 'All')} onClick={() => setActiveFilter('All')}>الكل</button>
+            <button style={pageStyles.tabBtn(activeFilter === 'Active')} onClick={() => setActiveFilter('Active')}>نشط</button>
+            <button style={pageStyles.tabBtn(activeFilter === 'Completed')} onClick={() => setActiveFilter('Completed')}>مكتمل</button>
           </div>
         </div>
 
@@ -235,8 +235,8 @@ export default function MyCourses() {
                 
                 <div style={pageStyles.cardBody}>
                   <div style={pageStyles.tagsContainer}>
-                    <span style={{...pageStyles.tag, ...pageStyles.tagActive}}>{course.status === 'نشط' ? 'Active' : course.status}</span>
-                    <span style={pageStyles.tag}>{course.type === 'اونلاين' ? 'Online' : 'Offline'}</span>
+                    <span style={{...pageStyles.tag, ...pageStyles.tagActive}}>{course.status === 'نشط' ? 'نشط' : course.status}</span>
+                    <span style={pageStyles.tag}>{course.type === 'اونلاين' ? 'أونلاين' : 'حضوري'}</span>
                   </div>
                   
                   <h3 style={pageStyles.cardTitle}>{course.title}</h3>
@@ -257,7 +257,7 @@ export default function MyCourses() {
                     onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#0a365c'}
                     onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#0f4c81'}
                   >
-                    Enter Class <MdPlayCircleFilled size={20} />
+                    دخول الفصل <MdPlayCircleFilled size={20} />
                   </button>
                 </div>
               </div>
