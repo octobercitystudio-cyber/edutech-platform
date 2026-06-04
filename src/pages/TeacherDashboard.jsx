@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MdPeople, MdMenuBook, MdAttachMoney, MdQuestionAnswer, MdAddCircle, MdAssignment, MdEdit, MdDelete, MdContentCopy, MdVisibilityOff } from 'react-icons/md';
+import { MdPeople, MdMenuBook, MdAttachMoney, MdQuestionAnswer, MdAddCircle, MdAssignment, MdEdit, MdDelete, MdContentCopy, MdVisibilityOff, MdVideocam } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -15,6 +15,7 @@ export default function TeacherDashboard() {
     questions: 0
   });
   const [recentCourses, setRecentCourses] = useState([]);
+  const [upcomingTasks, setUpcomingTasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Mock data for the chart (In reality, derived from enrollments)
@@ -30,7 +31,43 @@ export default function TeacherDashboard() {
 
   useEffect(() => {
     fetchTeacherStats();
+    fetchUpcomingTasks();
   }, [userName]);
+
+  const fetchUpcomingTasks = async () => {
+    try {
+      // Fetch Live Sessions
+      const { data: liveData } = await supabase
+        .from('live_sessions')
+        .select('id, title, start_time')
+        .eq('instructor_name', userName)
+        .gte('start_time', new Date().toISOString())
+        .order('start_time', { ascending: true })
+        .limit(3);
+
+      // Fetch Assignments
+      const { data: assignData } = await supabase
+        .from('assignments')
+        .select('id, title, due_date')
+        .eq('instructor_name', userName)
+        .gte('due_date', new Date().toISOString())
+        .order('due_date', { ascending: true })
+        .limit(3);
+
+      let tasks = [];
+      if (liveData) {
+        tasks = [...tasks, ...liveData.map(l => ({ ...l, type: 'live', date: l.start_time }))];
+      }
+      if (assignData) {
+        tasks = [...tasks, ...assignData.map(a => ({ ...a, type: 'assignment', date: a.due_date }))];
+      }
+
+      tasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+      setUpcomingTasks(tasks.slice(0, 4));
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const fetchTeacherStats = async () => {
     try {
@@ -234,24 +271,32 @@ export default function TeacherDashboard() {
               <h2 style={{margin: 0, color: 'var(--primary-color)', display: 'flex', alignItems: 'center', gap: '8px'}}>
                 <MdAssignment /> المهام القادمة
               </h2>
-              <span className="badge badge-primary">3 مهام</span>
+              <span className="badge badge-primary">{upcomingTasks.length} مهام</span>
             </div>
             
             <div style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
-              <div style={{padding: '10px', borderRight: '3px solid #ffb703', backgroundColor: '#f8fafc'}}>
-                <div style={{fontWeight: 'bold', fontSize: '0.9rem'}}>جلسة بث مباشر (فيزياء)</div>
-                <div style={{fontSize: '0.8rem', color: 'var(--text-muted)'}}>اليوم - 08:00 مساءً</div>
-              </div>
-              <div style={{padding: '10px', borderRight: '3px solid #e74c3c', backgroundColor: '#f8fafc'}}>
-                <div style={{fontWeight: 'bold', fontSize: '0.9rem'}}>تقييم واجبات (الفصل الأول)</div>
-                <div style={{fontSize: '0.8rem', color: 'var(--text-muted)'}}>غداً - 12:00 ظهراً</div>
-              </div>
-              <div style={{padding: '10px', borderRight: '3px solid #10b981', backgroundColor: '#f8fafc'}}>
-                <div style={{fontWeight: 'bold', fontSize: '0.9rem'}}>تفعيل امتحان الميدتيرم</div>
-                <div style={{fontSize: '0.8rem', color: 'var(--text-muted)'}}>الأربعاء القادم</div>
-              </div>
+              {upcomingTasks.length === 0 ? (
+                <div style={{textAlign: 'center', padding: '10px', color: 'var(--text-muted)'}}>لا توجد مهام قادمة قريباً</div>
+              ) : (
+                upcomingTasks.map((task, idx) => (
+                  <div key={idx} style={{
+                    padding: '10px', 
+                    borderRight: `3px solid ${task.type === 'live' ? '#e74c3c' : '#ffb703'}`, 
+                    backgroundColor: '#f8fafc',
+                    display: 'flex', alignItems: 'center', gap: '10px'
+                  }}>
+                    {task.type === 'live' ? <MdVideocam color="#e74c3c" /> : <MdAssignment color="#ffb703" />}
+                    <div>
+                      <div style={{fontWeight: 'bold', fontSize: '0.9rem'}}>{task.title}</div>
+                      <div style={{fontSize: '0.8rem', color: 'var(--text-muted)'}}>
+                        {new Date(task.date).toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' })}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-            <button className="btn btn-outline" style={{width: '100%', marginTop: '20px'}}>عرض كل المهام</button>
+            <button className="btn btn-outline" style={{width: '100%', marginTop: '20px'}} onClick={() => navigate('/teacher-live')}>إدارة المهام</button>
           </div>
 
           <div className="card" style={{padding: 'var(--space-6)', border: '1px solid #e2e8f0', background: 'linear-gradient(135deg, var(--primary-color), #0a365c)', color: 'white'}}>

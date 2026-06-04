@@ -21,6 +21,10 @@ import TeacherExams from './pages/TeacherExams';
 import TeacherStudents from './pages/TeacherStudents';
 import TeacherFinances from './pages/TeacherFinances';
 import TeacherMarketing from './pages/TeacherMarketing';
+import TeacherAssignments from './pages/TeacherAssignments';
+import TeacherLive from './pages/TeacherLive';
+import TeacherAnnouncements from './pages/TeacherAnnouncements';
+import TeacherReports from './pages/TeacherReports';
 import PlaceholderPage from './pages/PlaceholderPage';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminUsers from './pages/AdminUsers';
@@ -132,11 +136,11 @@ function App() {
         <Route path="/teacher-finances" element={<TeacherFinances />} />
         <Route path="/teacher-marketing" element={<TeacherMarketing />} />
         
-        {/* Placeholder Routes for pending features */}
-        <Route path="/teacher-assignments" element={<PlaceholderPage title="إدارة الواجبات والتكليفات" />} />
-        <Route path="/teacher-live" element={<PlaceholderPage title="إدارة الفصول المباشرة" />} />
-        <Route path="/teacher-announcements" element={<PlaceholderPage title="إرسال الإعلانات للطلاب" />} />
-        <Route path="/teacher-reports" element={<PlaceholderPage title="التقارير الشاملة" />} />
+        {/* New Teacher Features */}
+        <Route path="/teacher-assignments" element={<TeacherAssignments />} />
+        <Route path="/teacher-live" element={<TeacherLive />} />
+        <Route path="/teacher-announcements" element={<TeacherAnnouncements />} />
+        <Route path="/teacher-reports" element={<TeacherReports />} />
       </Route>
       
       {/* Super Admin Routes */}
